@@ -32,6 +32,7 @@ function restingQuat(value: number, yaw: number) {
 }
 
 const SIZE = 0.52;
+const HULL = new THREE.MeshBasicMaterial({ color: '#2B1A10', side: THREE.BackSide });
 const REST_Y = 0.16 + SIZE / 2;
 const DURATION = 1.25;
 
@@ -98,6 +99,9 @@ function Die({ value, rollId, index, onLanded }: { value: number; rollId: number
   return (
     <mesh ref={ref} material={mats} castShadow position={anim.current.end} quaternion={anim.current.qEnd}>
       <boxGeometry args={[SIZE, SIZE, SIZE]} />
+      <mesh material={HULL} scale={1.07}>
+        <boxGeometry args={[SIZE, SIZE, SIZE]} />
+      </mesh>
     </mesh>
   );
 }

@@ -1,14 +1,34 @@
 // Pion manusia 3D: berjalan (kaki & tangan berayun), melompat kecil di tiap petak,
 // melompat tinggi saat dipindah jauh (mis. ke Hotel Prodeo), menghadap arah langkah.
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { tokenInfo, type HatKind } from '../ui/constants.ts';
 import { toon } from './materials.ts';
 import { TILE_TOP } from './layout3d.ts';
 
+export interface Emote {
+  kind: 'celebrate' | 'sad';
+  id: number;
+}
+
+// Garis tepi kartun dengan teknik "inverted hull": salinan geometri sedikit lebih besar,
+// hanya sisi belakang yang digambar, berwarna gelap. Ringan & stabil walau pion dianimasikan.
+const HULL_MAT = new THREE.MeshBasicMaterial({ color: '#2B1A10', side: THREE.BackSide });
+const T = 0.0065; // tebal garis (satuan lokal)
+function Hull({ r, h = 0, children }: { r: number; h?: number; children: ReactNode }) {
+  const sx = 1 + T / r;
+  const sy = 1 + T / (r + h / 2);
+  return (
+    <mesh material={HULL_MAT} scale={[sx, sy, sx]}>
+      {children}
+    </mesh>
+  );
+}
+
 interface Props {
+  emote?: Emote | null;
   token: string;
   color: string;
   target: [number, number]; // x, z tujuan
@@ -106,7 +126,7 @@ function Hat({ kind, color }: { kind: HatKind; color: string }) {
   }
 }
 
-export default function Pawn({ token, color, target, stepMs, active, jailed, registry, id }: Props) {
+export default function Pawn({ token, color, target, stepMs, active, jailed, registry, id, emote }: Props) {
   const info = tokenInfo(token);
   const root = useRef<THREE.Group>(null);
   const body = useRef<THREE.Group>(null);
@@ -116,6 +136,12 @@ export default function Pawn({ token, color, target, stepMs, active, jailed, reg
   const armR = useRef<THREE.Group>(null);
   const ring = useRef<THREE.Mesh>(null);
   const arrow = useRef<THREE.Group>(null);
+  const head = useRef<THREE.Group>(null);
+  const emo = useRef<{ kind: Emote['kind']; t: number } | null>(null);
+  const squash = useRef(0);
+  useEffect(() => {
+    if (emote) emo.current = { kind: emote.kind, t: 0 };
+  }, [emote?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const st = useRef({
     pos: new THREE.Vector3(target[0], TILE_TOP, target[1]),
     from: new THREE.Vector3(target[0], TILE_TOP, target[1]),
@@ -154,6 +180,7 @@ export default function Pawn({ token, color, target, stepMs, active, jailed, reg
     if (s.t < 1) {
       moving = true;
       s.t = Math.min(1, s.t + dt / s.dur);
+      if (s.t >= 1) squash.current = 1; // mendarat: efek kenyal
       const e = s.t;
       s.pos.lerpVectors(s.from, s.to, s.jump ? e * e * (3 - 2 * e) : e);
       const hop = s.jump ? 1.8 : 0.2;
@@ -178,13 +205,52 @@ export default function Pawn({ token, color, target, stepMs, active, jailed, reg
     g.position.copy(s.pos);
     g.rotation.y = s.yaw;
     const swing = moving ? Math.sin(s.phase) * 0.8 : 0;
+    // Emosi: bersorak (lompat, tangan ke atas) atau lesu (kepala tertunduk) selama ±1,8 detik
+    const e = emo.current;
+    if (e) {
+      e.t += dt;
+      if (e.t > 1.9) emo.current = null;
+    }
+    const cheer = !moving && e?.kind === 'celebrate';
+    const sad = !moving && e?.kind === 'sad';
+    let armLx = -swing * 0.9;
+    let armRx = swing * 0.9;
+    // Sumbu Z: lengan kiri (x negatif) diangkat keluar dengan sudut negatif, lengan kanan positif.
+    let armLz = -0.1;
+    let armRz = 0.1;
+    let bodyY = moving ? Math.abs(Math.sin(s.phase)) * 0.025 : Math.sin(time * 2 + s.from.x) * 0.006;
+    let headX = 0;
+    let lean = 0;
+    if (cheer) {
+      armLz = -2.5 - Math.sin(time * 14) * 0.25;
+      armRz = 2.5 + Math.sin(time * 14) * 0.25;
+      armLx = armRx = 0;
+      bodyY = Math.abs(Math.sin(e!.t * 9)) * 0.09;
+    } else if (sad) {
+      armLz = -0.02;
+      armRz = 0.02;
+      armLx = armRx = 0.25;
+      headX = 0.55;
+      lean = 0.12 + Math.sin(time * 20) * (e!.t < 0.4 ? 0.04 : 0);
+      bodyY = -0.01;
+    } else if (active && !moving) {
+      // melambai saat giliran sendiri
+      armRz = 2.3 + Math.sin(time * 9) * 0.35;
+      armRx = 0;
+    }
     if (legL.current) legL.current.rotation.x = swing;
     if (legR.current) legR.current.rotation.x = -swing;
-    if (armL.current) armL.current.rotation.x = -swing * 0.9;
-    if (armR.current) armR.current.rotation.x = swing * 0.9;
-    if (armL.current) armL.current.rotation.z = moving ? 0.1 : active ? 0.15 + Math.sin(time * 3) * 0.05 : 0.1;
-    if (armR.current) armR.current.rotation.z = moving ? -0.1 : active ? -(0.15 + Math.sin(time * 3) * 0.05) : -0.1;
-    if (body.current) body.current.position.y = moving ? Math.abs(Math.sin(s.phase)) * 0.025 : Math.sin(time * 2 + s.from.x) * 0.006;
+    if (armL.current) armL.current.rotation.set(armLx, 0, armLz);
+    if (armR.current) armR.current.rotation.set(armRx, 0, armRz);
+    if (head.current) head.current.rotation.x = headX;
+    // Efek mendarat: tergencet sebentar lalu memantul kembali
+    squash.current = Math.max(0, squash.current - dt * 6);
+    const sq = Math.sin(squash.current * Math.PI) * 0.18;
+    if (body.current) {
+      body.current.position.y = bodyY;
+      body.current.rotation.x = lean;
+      body.current.scale.set(1.75 * (1 + sq * 0.5), 1.75 * (1 - sq), 1.75 * (1 + sq * 0.5));
+    }
     if (ring.current) {
       ring.current.visible = active;
       const k = 1 + Math.sin(time * 4) * 0.12;
@@ -215,6 +281,9 @@ export default function Pawn({ token, color, target, stepMs, active, jailed, reg
         <group ref={legL} position={[-0.035, 0.15, 0]}>
           <mesh position={[0, -0.07, 0]} material={pants} castShadow>
             <capsuleGeometry args={[0.03, 0.08, 4, 8]} />
+            <Hull r={0.03} h={0.08}>
+              <capsuleGeometry args={[0.03, 0.08, 4, 8]} />
+            </Hull>
           </mesh>
           <mesh position={[0, -0.135, 0.015]} material={toon('#2B1A10')}>
             <boxGeometry args={[0.05, 0.025, 0.08]} />
@@ -223,6 +292,9 @@ export default function Pawn({ token, color, target, stepMs, active, jailed, reg
         <group ref={legR} position={[0.035, 0.15, 0]}>
           <mesh position={[0, -0.07, 0]} material={pants} castShadow>
             <capsuleGeometry args={[0.03, 0.08, 4, 8]} />
+            <Hull r={0.03} h={0.08}>
+              <capsuleGeometry args={[0.03, 0.08, 4, 8]} />
+            </Hull>
           </mesh>
           <mesh position={[0, -0.135, 0.015]} material={toon('#2B1A10')}>
             <boxGeometry args={[0.05, 0.025, 0.08]} />
@@ -231,6 +303,9 @@ export default function Pawn({ token, color, target, stepMs, active, jailed, reg
         {/* badan (kemeja warna pemain) */}
         <mesh position={[0, 0.24, 0]} material={shirt} castShadow>
           <capsuleGeometry args={[0.065, 0.1, 4, 10]} />
+          <Hull r={0.065} h={0.1}>
+            <capsuleGeometry args={[0.065, 0.1, 4, 10]} />
+          </Hull>
         </mesh>
         {/* motif kain: sabuk */}
         <mesh position={[0, 0.17, 0]} material={toon('#F2C230')}>
@@ -240,6 +315,9 @@ export default function Pawn({ token, color, target, stepMs, active, jailed, reg
         <group ref={armL} position={[-0.085, 0.3, 0]}>
           <mesh position={[0, -0.06, 0]} material={shirt} castShadow>
             <capsuleGeometry args={[0.022, 0.07, 4, 6]} />
+            <Hull r={0.022} h={0.07}>
+              <capsuleGeometry args={[0.022, 0.07, 4, 6]} />
+            </Hull>
           </mesh>
           <mesh position={[0, -0.115, 0]} material={skin}>
             <sphereGeometry args={[0.022, 8, 6]} />
@@ -248,15 +326,21 @@ export default function Pawn({ token, color, target, stepMs, active, jailed, reg
         <group ref={armR} position={[0.085, 0.3, 0]}>
           <mesh position={[0, -0.06, 0]} material={shirt} castShadow>
             <capsuleGeometry args={[0.022, 0.07, 4, 6]} />
+            <Hull r={0.022} h={0.07}>
+              <capsuleGeometry args={[0.022, 0.07, 4, 6]} />
+            </Hull>
           </mesh>
           <mesh position={[0, -0.115, 0]} material={skin}>
             <sphereGeometry args={[0.022, 8, 6]} />
           </mesh>
         </group>
         {/* kepala */}
-        <group position={[0, 0.405, 0]}>
+        <group ref={head} position={[0, 0.405, 0]}>
           <mesh material={skin} castShadow>
             <sphereGeometry args={[0.075, 16, 12]} />
+            <Hull r={0.075}>
+              <sphereGeometry args={[0.075, 16, 12]} />
+            </Hull>
           </mesh>
           <mesh position={[-0.026, 0.01, 0.066]} material={toon('#1A1A1A')}>
             <sphereGeometry args={[0.011, 6, 6]} />

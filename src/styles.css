@@ -1815,3 +1815,47 @@ h3 {
     bottom: 10px;
   }
 }
+
+/* ===== Efek teks melayang (papan 3D) ===== */
+.fx-float {
+  font-family: var(--font-display);
+  font-size: clamp(16px, 2.2vw, 26px);
+  white-space: nowrap;
+  padding: 2px 12px;
+  border-radius: 999px;
+  border: 3px solid #fff;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  animation: fx-rise 2.4s ease-out forwards;
+  user-select: none;
+}
+.fx-plus {
+  background: #2e8b3a;
+}
+.fx-minus {
+  background: #c0392b;
+}
+.fx-info {
+  background: #e3a21a;
+  color: #3b2414;
+}
+@keyframes fx-rise {
+  0% {
+    transform: translateY(14px) scale(0.6);
+    opacity: 0;
+  }
+  12% {
+    transform: translateY(0) scale(1.12);
+    opacity: 1;
+  }
+  22% {
+    transform: translateY(-4px) scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-46px) scale(0.95);
+    opacity: 0;
+  }
+}

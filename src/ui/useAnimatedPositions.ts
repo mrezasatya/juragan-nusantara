@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import type { GameState } from '../engine/types.ts';
+import { sfx } from './sfx.ts';
 
 /** Posisi pion yang ditampilkan, dianimasikan petak demi petak mengikuti event gerak dari engine. */
 export function useAnimatedPositions(game: GameState, onAnimating: (b: boolean) => void, stepMs: number) {
@@ -50,6 +51,7 @@ export function useAnimatedPositions(game: GameState, onAnimating: (b: boolean) 
       }
       setMover(job.player);
       const next = job.path.shift()!;
+      sfx.step(next);
       setPos((p) => ({ ...p, [job.player]: next }));
       if (!job.path.length) queue.current.shift();
       setTimeout(tick, job.path.length ? stepMs : stepMs * 2);

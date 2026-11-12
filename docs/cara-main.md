@@ -11,6 +11,7 @@ Juragan Nusantara adalah board game properti bertema Indonesia untuk **2–6 pem
 - Papan tampil dalam **3D** secara bawaan. **Seret** untuk memutar kamera, **cubit atau scroll** untuk zoom, dan **ketuk petak** untuk melihat detailnya. Tombol 🎥 mengembalikan kamera.
 - Pion berjalan petak demi petak sesuai angka dadu. Kamera otomatis mendekat ke pion yang sedang berjalan.
 - Rumah yang dibangun mengikuti **rumah adat** daerah propertinya. Resort tampil sebagai rumah adat besar dengan kolam dan bendera pemilik.
+- Efek suara bisa dimatikan atau dinyalakan lewat tombol 🔊 di bagian atas layar.
 - Di perangkat yang berat atau tidak mendukung 3D, tekan tombol **2D** (atau lewat Menu) untuk tampilan ringan. Aturan main tetap sama.
 
 ## Tujuan

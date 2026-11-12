@@ -18,6 +18,7 @@ Proyek hiburan non-komersial. Spesifikasi lengkap ada di [`docs/konsep-game-jura
 - Responsif dari lebar 360px sampai layar proyektor.
 - **Tampilan 3D** (bawaan): papan mengapung di atas laut, pion manusia yang berjalan petak demi petak sesuai angka dadu, dadu 3D yang menggelinding, rumah adat 3D sesuai wilayah properti (Rumah Bolon, Rumah Gadang, rumah Sunda/Betawi, Joglo, Bale Bali, Rumah Betang, Tongkonan, Honai), dan kamera yang mengikuti pion yang sedang berjalan.
 - **Tampilan 2D ringan** sebagai cadangan otomatis untuk perangkat tanpa WebGL. Bisa juga dipilih lewat tombol "2D" atau Menu.
+- **Efek & suara**: teks uang melayang (+Rp/−Rp), hujan koin, konfeti saat membeli properti dan saat menang, rumah yang muncul memantul, pion bersorak/lesu/melambai, garis tepi kartun, serta efek suara yang disintesis di browser (tanpa file audio) dengan tombol 🔊/🔇.
 - **Galeri 3D** di beranda untuk melihat 8 rumah adat, versi Resort, dan 8 karakter pion.
 
 ## Menjalankan

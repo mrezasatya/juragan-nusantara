@@ -19,6 +19,8 @@ import { ITEM_LABEL } from '../ui/constants.ts';
 import { CONFIG } from '../engine/data.ts';
 import { cryptoDie, loadView, saveView, supportsWebGL, type ViewMode } from '../ui/storage.ts';
 import type { DiceRoll } from '../three/Dice3D.tsx';
+import { diffEvents, stamp, type FxEvent } from '../ui/gameEvents.ts';
+import { isMuted, setMuted, sfx, unlockAudio } from '../ui/sfx.ts';
 
 const Board3D = lazy(() => import('../three/Board3D.tsx'));
 
@@ -50,9 +52,55 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
   const physical = game.diceMode === 'fisik';
   const is3d = view === '3d';
 
+  // ===== Efek (suara & visual) yang ditahan sampai pion selesai berjalan =====
+  const [fx, setFx] = useState<FxEvent[]>([]);
+  const [muted, setMutedState] = useState(isMuted());
+  const [animDoneSeq, setAnimDoneSeq] = useState(game.moveSeq);
+  const latestMoveSeq = useRef(game.moveSeq);
+  latestMoveSeq.current = game.moveSeq;
+  const prevGame = useRef(game);
+  const pendingFx = useRef<ReturnType<typeof diffEvents>>([]);
+  const onAnimating = useCallback((b: boolean) => {
+    setAnimating(b);
+    if (!b) setAnimDoneSeq(latestMoveSeq.current);
+  }, []);
+  useEffect(() => {
+    if (prevGame.current === game) return;
+    pendingFx.current.push(...diffEvents(prevGame.current, game));
+    prevGame.current = game;
+  }, [game]);
+  const settled = !animating && !rolling && game.moveSeq === animDoneSeq;
+  useEffect(() => {
+    if (!settled || !pendingFx.current.length) return;
+    const evs = stamp(pendingFx.current.splice(0));
+    setFx((f) => [...f, ...evs].slice(-40));
+    playSounds(evs);
+  }, [settled, game]);
+  // Pengaman: jika animasi tidak melapor (mis. papan 3D masih dimuat), jangan tahan efek selamanya.
+  useEffect(() => {
+    if (animating || game.moveSeq === animDoneSeq) return;
+    const t = setTimeout(() => setAnimDoneSeq(latestMoveSeq.current), 4000);
+    return () => clearTimeout(t);
+  }, [animating, game.moveSeq, animDoneSeq]);
+  useEffect(() => {
+    if (!fx.length) return;
+    const t = setTimeout(() => setFx((f) => f.filter((e) => performance.now() - e.at < 3000)), 3100);
+    return () => clearTimeout(t);
+  }, [fx]);
+  useEffect(() => {
+    const unlock = () => unlockAudio();
+    window.addEventListener('pointerdown', unlock, { once: true });
+    return () => window.removeEventListener('pointerdown', unlock);
+  }, []);
+  const toggleMute = () => {
+    setMuted(!muted);
+    setMutedState(!muted);
+  };
+
   const switchView = (v: ViewMode) => {
     setView(v);
     saveView(v);
+    setAnimDoneSeq(game.moveSeq);
   };
 
   /** Selesaikan lemparan: kirim angka dadu ke engine (dipanggil setelah animasi dadu mendarat). */
@@ -69,6 +117,8 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
   );
 
   const throwDice = (values: [number, number]) => {
+    unlockAudio();
+    sfx.dice();
     if (!is3d) {
       setRolling(true);
       setTimeout(() => {
@@ -99,7 +149,8 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
   }, [game.prompt, panel]);
 
   const timeLeft = game.kilat?.endsAt ? Math.max(0, game.kilat.endsAt - now) : null;
-  const canManage = !busy && (!game.prompt || game.prompt.type === 'debt' || game.prompt.type === 'buy') && game.phase !== 'resolving';
+  const canManage =
+    !busy && game.phase !== 'gameOver' && (!game.prompt || game.prompt.type === 'debt' || game.prompt.type === 'buy') && game.phase !== 'resolving';
   const outsideTurnFlow = !game.prompt && (game.phase === 'preRoll' || game.phase === 'postRoll');
 
   return (
@@ -119,6 +170,9 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
           {game.kilat?.maxRounds ? `/${game.kilat.maxRounds}` : ''}
           {timeLeft !== null && <span className={timeLeft === 0 ? 'time-up' : ''}> · ⏱ {fmtTime(timeLeft)}</span>}
         </div>
+        <button className="btn btn-ghost btn-sm" onClick={toggleMute} aria-label={muted ? 'Nyalakan suara' : 'Matikan suara'} title={muted ? 'Nyalakan suara' : 'Matikan suara'}>
+          {muted ? '🔇' : '🔊'}
+        </button>
         <button className="btn btn-ghost btn-sm" onClick={onRules} aria-label="Cara main">
           ?
         </button>
@@ -131,7 +185,8 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
               <Board3D
                 game={game}
                 onTileClick={setTileInfo}
-                onAnimating={setAnimating}
+                onAnimating={onAnimating}
+                fx={fx}
                 diceRoll={diceRoll}
                 rolling={rolling}
                 onDiceDone={(r) => finishRoll(r.id)}
@@ -139,7 +194,7 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
               />
             </Suspense>
           ) : (
-            <Board game={game} onTileClick={setTileInfo} onAnimating={setAnimating} highlight={me.position}>
+            <Board game={game} onTileClick={setTileInfo} onAnimating={onAnimating} highlight={me.position}>
               <CenterPanel game={game} rolling={rolling} />
             </Board>
           )}
@@ -319,6 +374,30 @@ function TurnActions({
     );
   }
   return null;
+}
+
+/** Satu suara per jenis kejadian per kelompok, diberi jeda supaya tidak menumpuk. */
+function playSounds(evs: FxEvent[]) {
+  const kinds = new Set<string>(evs.map((e) => (e.kind === 'money' ? (e.amount > 0 ? 'gain' : 'loss') : e.kind)));
+  const order: [string, () => void][] = [
+    ['win', sfx.win],
+    ['bankrupt', sfx.bankrupt],
+    ['jail', sfx.jail],
+    ['buy', sfx.buy],
+    ['build', sfx.build],
+    ['card', sfx.card],
+    ['gain', sfx.coin],
+    ['loss', sfx.pay],
+    ['turn', sfx.turn],
+  ];
+  let delay = 0;
+  for (const [k, play] of order) {
+    if (!kinds.has(k)) continue;
+    if (k === 'loss' && (kinds.has('buy') || kinds.has('build'))) continue;
+    if (k === 'turn' && kinds.size > 1) continue;
+    setTimeout(play, delay);
+    delay += 220;
+  }
 }
 
 function useNow(interval: number | null) {
