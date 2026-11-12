@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc -b",
     "extract": "node scripts/extract-content.ts",
-    "simulate": "vitest run --config vitest.sim.config.ts"
+    "simulate": "vitest run --config vitest.sim.config.ts",
+    "e2e": "node e2e/play.mjs"
   },
   "dependencies": {
     "react": "^19.3.1",

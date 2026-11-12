@@ -1,0 +1,79 @@
+{
+  "games": 100,
+  "klasik_2p": {
+    "games": 100,
+    "errors": 0,
+    "finished": 100,
+    "avgRounds": 77.2,
+    "medianRounds": 73,
+    "p90Rounds": 110,
+    "avgTurns": 152.8,
+    "avgBankrupt": 1,
+    "avgMaxWarkop": 133.1,
+    "avgMaxArisan": 253.1
+  },
+  "klasik_4p": {
+    "games": 100,
+    "errors": 0,
+    "finished": 100,
+    "avgRounds": 56.1,
+    "medianRounds": 54,
+    "p90Rounds": 82,
+    "avgTurns": 183.2,
+    "avgBankrupt": 3,
+    "avgMaxWarkop": 163.3,
+    "avgMaxArisan": 292.3
+  },
+  "klasik_6p": {
+    "games": 100,
+    "errors": 0,
+    "finished": 100,
+    "avgRounds": 50.3,
+    "medianRounds": 46,
+    "p90Rounds": 78,
+    "avgTurns": 227.9,
+    "avgBankrupt": 5,
+    "avgMaxWarkop": 202.8,
+    "avgMaxArisan": 355.8
+  },
+  "kilat_4p_10r": {
+    "games": 100,
+    "errors": 0,
+    "finished": 100,
+    "avgRounds": 10,
+    "medianRounds": 10,
+    "p90Rounds": 10,
+    "avgTurns": 39.6,
+    "avgBankrupt": 0.1,
+    "avgMaxWarkop": 73.5,
+    "avgMaxArisan": 56.5
+  },
+  "kilat_4p_15r": {
+    "games": 100,
+    "errors": 0,
+    "finished": 100,
+    "avgRounds": 15,
+    "medianRounds": 15,
+    "p90Rounds": 15,
+    "avgTurns": 58.2,
+    "avgBankrupt": 0.5,
+    "avgMaxWarkop": 99.9,
+    "avgMaxArisan": 91.3
+  },
+  "kilat_4p_20r": {
+    "games": 100,
+    "errors": 0,
+    "finished": 100,
+    "avgRounds": 19.9,
+    "medianRounds": 20,
+    "p90Rounds": 20,
+    "avgTurns": 74.7,
+    "avgBankrupt": 0.9,
+    "avgMaxWarkop": 119.9,
+    "avgMaxArisan": 120.1
+  },
+  "cardDrawsMinMax": {
+    "min": 11,
+    "max": 44
+  }
+}
