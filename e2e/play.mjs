@@ -52,7 +52,8 @@ async function step(page) {
       await any.first().click();
       return 'prompt';
     }
-    throw new Error(`Dialog tanpa tombol aktif: ${title}`);
+    // Dialog sedang berganti isi; coba lagi di langkah berikutnya (macet sungguhan tertangkap oleh batas tunggu).
+    return 'wait';
   }
   for (const name of [/Lempar Dadu|Masukkan Dadu/, /Lempar, cari dobel/, /Selesai Giliran/]) {
     const b = page.getByRole('button', { name });
@@ -78,9 +79,12 @@ async function playUntilOver(page, maxSteps) {
   throw new Error(`Permainan belum selesai setelah ${maxSteps} langkah`);
 }
 
-async function newGame(page, { mode, dice, rounds }) {
+async function newGame(page, { mode, dice, rounds, view = '3d' }) {
   await page.goto(BASE);
-  await page.evaluate(() => localStorage.clear());
+  await page.evaluate((v) => {
+    localStorage.clear();
+    localStorage.setItem('juragan-nusantara:view', v);
+  }, view);
   await page.reload();
   await page.getByRole('button', { name: 'Lewati' }).click();
   await page.getByRole('button', { name: /Permainan Baru/ }).click();
@@ -106,8 +110,10 @@ try {
     page.on('pageerror', (e) => errors.push(e.message));
     page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 
-    // 1) Permainan Kilat penuh, 4 pemain, dadu digital
+    // 1) Permainan Kilat penuh, 4 pemain, dadu digital, papan 3D (bawaan)
     await newGame(page, { mode: 'kilat', dice: 'digital', rounds: 4 });
+    await page.locator('.board3d canvas').waitFor({ timeout: 20000 });
+    log(`${viewport.width}px: papan 3D tampil`);
     const steps = await playUntilOver(page, 1500);
     log(`${viewport.width}px: permainan Kilat 4 pemain selesai dalam ${steps} langkah UI`);
     if (SHOTS) await page.screenshot({ path: `${SHOTS}/e2e-${viewport.width}-gameover.png` });
@@ -128,8 +134,9 @@ try {
     if (before !== after || logBefore !== logAfter) throw new Error(`Simpan otomatis gagal: "${before}" vs "${after}"`);
     log(`${viewport.width}px: lanjutkan setelah reload OK (${after?.trim()})`);
 
-    // 3) Mode dadu fisik
-    await newGame(page, { mode: 'kilat', dice: 'fisik', rounds: 2 });
+    // 3) Mode dadu fisik, sekaligus uji tampilan 2D (ringan)
+    await newGame(page, { mode: 'kilat', dice: 'fisik', rounds: 2, view: '2d' });
+    await page.locator('.board').waitFor();
     const steps2 = await playUntilOver(page, 800);
     log(`${viewport.width}px: permainan dengan dadu fisik selesai dalam ${steps2} langkah UI`);
 

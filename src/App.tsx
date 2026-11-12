@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { createGame, GameError, reduce, type NewGameOptions } from './engine/engine.ts';
 import type { Action, GameState } from './engine/types.ts';
 import { clearGame, cryptoSeed, loadGame, markTutorialSeen, saveGame, tutorialSeen } from './ui/storage.ts';
@@ -8,7 +8,9 @@ import Game from './components/Game.tsx';
 import Rules from './components/Rules.tsx';
 import Tutorial from './components/Tutorial.tsx';
 
-type Screen = 'home' | 'setup' | 'game';
+type Screen = 'home' | 'setup' | 'game' | 'gallery';
+
+const Gallery3D = lazy(() => import('./three/Gallery3D.tsx'));
 
 export type Dispatch = (a: Action) => boolean;
 
@@ -20,6 +22,10 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null);
   const gameRef = useRef(game);
   gameRef.current = game;
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [screen]);
 
   useEffect(() => {
     if (!toast) return;
@@ -68,7 +74,13 @@ export default function App() {
           onNew={() => setScreen('setup')}
           onRules={() => setShowRules(true)}
           onTutorial={() => setShowTutorial(true)}
+          onGallery={() => setScreen('gallery')}
         />
+      )}
+      {screen === 'gallery' && (
+        <Suspense fallback={<div className="gallery-loading">Menyiapkan galeri 3D…</div>}>
+          <Gallery3D onClose={() => setScreen('home')} />
+        </Suspense>
       )}
       {screen === 'setup' && <Setup onBack={() => setScreen('home')} onStart={startGame} />}
       {screen === 'game' && game && (

@@ -6,9 +6,10 @@ interface Props {
   onNew: () => void;
   onRules: () => void;
   onTutorial: () => void;
+  onGallery: () => void;
 }
 
-export default function Home({ hasSave, onContinue, onNew, onRules, onTutorial }: Props) {
+export default function Home({ hasSave, onContinue, onNew, onRules, onTutorial, onGallery }: Props) {
   return (
     <main className="home">
       <div className="home-card">
@@ -31,6 +32,9 @@ export default function Home({ hasSave, onContinue, onNew, onRules, onTutorial }
               💡 Tutorial Singkat
             </button>
           </div>
+          <button className="btn" onClick={onGallery}>
+            🏠 Galeri Rumah Adat &amp; Pion 3D
+          </button>
         </div>
         <p className="home-foot">
           2–6 pemain · satu perangkat, main bergantian · untuk remaja &amp; dewasa

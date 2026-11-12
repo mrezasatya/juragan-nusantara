@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import type { Dispatch } from '../App.tsx';
 import { canEndTurn, canRoll, currentPlayer } from '../engine/engine.ts';
 import { rp } from '../engine/format.ts';
@@ -17,7 +17,10 @@ import Modal from './Modal.tsx';
 import { DicePicker } from './DicePicker.tsx';
 import { ITEM_LABEL } from '../ui/constants.ts';
 import { CONFIG } from '../engine/data.ts';
-import { cryptoDie } from '../ui/storage.ts';
+import { cryptoDie, loadView, saveView, supportsWebGL, type ViewMode } from '../ui/storage.ts';
+import type { DiceRoll } from '../three/Dice3D.tsx';
+
+const Board3D = lazy(() => import('../three/Board3D.tsx'));
 
 interface Props {
   game: GameState;
@@ -40,17 +43,52 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
   const me = currentPlayer(game);
   const now = useNow(game.kilat?.endsAt ? 1000 : null);
 
+  const [view, setView] = useState<ViewMode>(() => loadView());
+  const [diceRoll, setDiceRoll] = useState<DiceRoll | null>(null);
+  const pendingRoll = useRef<{ id: number; values: [number, number]; timer: number } | null>(null);
   const busy = animating || rolling;
   const physical = game.diceMode === 'fisik';
+  const is3d = view === '3d';
+
+  const switchView = (v: ViewMode) => {
+    setView(v);
+    saveView(v);
+  };
+
+  /** Selesaikan lemparan: kirim angka dadu ke engine (dipanggil setelah animasi dadu mendarat). */
+  const finishRoll = useCallback(
+    (id: number) => {
+      const p = pendingRoll.current;
+      if (!p || p.id !== id) return;
+      window.clearTimeout(p.timer);
+      pendingRoll.current = null;
+      setRolling(false);
+      dispatch({ type: 'ROLL', dice: p.values });
+    },
+    [dispatch],
+  );
+
+  const throwDice = (values: [number, number]) => {
+    if (!is3d) {
+      setRolling(true);
+      setTimeout(() => {
+        setRolling(false);
+        dispatch({ type: 'ROLL', dice: values });
+      }, 650);
+      return;
+    }
+    const id = Date.now();
+    // Pengaman: jika animasi 3D tidak melapor (mis. tab tidak aktif), tetap lanjut.
+    const timer = window.setTimeout(() => finishRoll(id), 3500);
+    pendingRoll.current = { id, values, timer };
+    setRolling(true);
+    setDiceRoll({ id, values });
+  };
 
   const roll = () => {
     if (!canRoll(game) || busy) return;
     if (physical) return setPickDice(true);
-    setRolling(true);
-    setTimeout(() => {
-      setRolling(false);
-      dispatch({ type: 'ROLL', dice: [cryptoDie(), cryptoDie()] });
-    }, 650);
+    throwDice([cryptoDie(), cryptoDie()]);
   };
 
   const endTurn = () => dispatch({ type: 'END_TURN', now: Date.now() });
@@ -87,10 +125,24 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
       </header>
 
       <div className="game-main">
-        <div className="board-wrap">
-          <Board game={game} onTileClick={setTileInfo} onAnimating={setAnimating} highlight={me.position}>
-            <CenterPanel game={game} rolling={rolling} />
-          </Board>
+        <div className={`board-wrap ${is3d ? 'board-wrap-3d' : ''}`}>
+          {is3d ? (
+            <Suspense fallback={<div className="board3d board3d-loading">Menyiapkan papan 3D…</div>}>
+              <Board3D
+                game={game}
+                onTileClick={setTileInfo}
+                onAnimating={setAnimating}
+                diceRoll={diceRoll}
+                rolling={rolling}
+                onDiceDone={(r) => finishRoll(r.id)}
+                onSwitch2D={() => switchView('2d')}
+              />
+            </Suspense>
+          ) : (
+            <Board game={game} onTileClick={setTileInfo} onAnimating={setAnimating} highlight={me.position}>
+              <CenterPanel game={game} rolling={rolling} />
+            </Board>
+          )}
         </div>
 
         <aside className="side">
@@ -146,7 +198,7 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
             count={2}
             onDone={(d) => {
               setPickDice(false);
-              dispatch({ type: 'ROLL', dice: [d[0], d[1]] });
+              throwDice([d[0], d[1]]);
             }}
           />
         </Modal>
@@ -157,6 +209,15 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
             <button className="btn" onClick={onRules}>
               📖 Cara Main
             </button>
+            {is3d ? (
+              <button className="btn" onClick={() => (switchView('2d'), setPanel(null))}>
+                🗺️ Ganti ke tampilan 2D (ringan)
+              </button>
+            ) : (
+              <button className="btn" disabled={!supportsWebGL()} onClick={() => (switchView('3d'), setPanel(null))}>
+                🎮 Ganti ke tampilan 3D{supportsWebGL() ? '' : ' (tidak didukung perangkat ini)'}
+              </button>
+            )}
             <button className="btn" onClick={onHome}>
               🏠 Ke Beranda (permainan tersimpan)
             </button>

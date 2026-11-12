@@ -49,3 +49,20 @@ export function cryptoSeed(): number {
   crypto.getRandomValues(buf);
   return buf[0] | 0;
 }
+
+const VIEW_KEY = 'juragan-nusantara:view';
+export type ViewMode = '3d' | '2d';
+export function supportsWebGL(): boolean {
+  return safe(() => {
+    const c = document.createElement('canvas');
+    return !!(c.getContext('webgl2') || c.getContext('webgl'));
+  }, false);
+}
+export function loadView(): ViewMode {
+  const saved = safe(() => localStorage.getItem(VIEW_KEY), null);
+  if (saved === '2d') return '2d';
+  return supportsWebGL() ? '3d' : '2d';
+}
+export function saveView(v: ViewMode) {
+  safe(() => localStorage.setItem(VIEW_KEY, v), undefined);
+}

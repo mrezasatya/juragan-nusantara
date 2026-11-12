@@ -16,6 +16,9 @@ Proyek hiburan non-komersial. Spesifikasi lengkap ada di [`docs/konsep-game-jura
 - Tutorial singkat, halaman Cara Main, dan detail setiap petak saat disentuh.
 - Simpan otomatis ke browser. Permainan bisa dilanjutkan setelah browser ditutup.
 - Responsif dari lebar 360px sampai layar proyektor.
+- **Tampilan 3D** (bawaan): papan mengapung di atas laut, pion manusia yang berjalan petak demi petak sesuai angka dadu, dadu 3D yang menggelinding, rumah adat 3D sesuai wilayah properti (Rumah Bolon, Rumah Gadang, rumah Sunda/Betawi, Joglo, Bale Bali, Rumah Betang, Tongkonan, Honai), dan kamera yang mengikuti pion yang sedang berjalan.
+- **Tampilan 2D ringan** sebagai cadangan otomatis untuk perangkat tanpa WebGL. Bisa juga dipilih lewat tombol "2D" atau Menu.
+- **Galeri 3D** di beranda untuk melihat 8 rumah adat, versi Resort, dan 8 karakter pion.
 
 ## Menjalankan
 
@@ -59,7 +62,8 @@ scripts/           ekstraksi data dari dokumen konsep
 src/data/          tiles.json, cards.json, groups.json, config.json
 src/engine/        aturan permainan sebagai fungsi murni (tanpa React) + unit test
 src/sim/           simulator bot untuk uji kestabilan & balancing
-src/components/    UI React: papan, panel, modal
+src/components/    UI React: papan 2D, panel, modal
+src/three/         tampilan 3D (Three.js + React Three Fiber): papan, pion, rumah adat, dadu, dekorasi
 e2e/               test browser end-to-end
 ```
 
@@ -69,6 +73,8 @@ Proyek sudah dikonfigurasi (`vercel.json`). Impor repositori di Vercel, atau jal
 
 ## Catatan
 
-- Ikon petak dan pion sementara memakai emoji. Ilustrasi bisa diganti di `src/ui/constants.ts` (pion) dan `scripts/extract-content.ts` (ikon petak).
+- Semua model 3D dibuat secara prosedural dari kode (gaya low-poly kartun), tanpa file model dari luar. Rumah adat adalah stilisasi bentuk khasnya, bukan rekonstruksi arsitektur yang presisi. Model bisa diganti dengan aset glTF buatan ilustrator di kemudian hari.
+- Ikon di permukaan petak memakai emoji yang digambar ke tekstur.
+- Modul 3D (sekitar 970 KB, atau ±250 KB terkompresi gzip) dimuat terpisah hanya saat papan 3D tampil.
 - Keputusan atas aturan yang tidak dijelaskan dokumen konsep tercatat di [`docs/keputusan-desain.md`](docs/keputusan-desain.md).
 - Harga di dalam game adalah mekanik permainan, bukan penilaian terhadap daerah atau warganya.

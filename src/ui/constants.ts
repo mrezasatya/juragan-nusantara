@@ -1,20 +1,26 @@
+export type HatKind = 'caping' | 'pet' | 'handuk' | 'pelaut' | 'blangkon' | 'bandana' | 'helm' | 'sanggul';
+
 export interface TokenOption {
   id: string;
   label: string;
-  emoji: string;
+  emoji: string; // dipakai di tampilan 2D & panel
+  hat: HatKind;
+  skin: string;
+  pants: string;
 }
 
-// Pion (Bagian 9). Sementara memakai emoji; mudah diganti ilustrasi SVG/PNG di sini.
+// Pion manusia 3D (id tetap sama dengan versi sebelumnya agar simpanan lama tetap terbaca).
 export const TOKENS: TokenOption[] = [
-  { id: 'becak', label: 'Becak', emoji: '🚲' },
-  { id: 'bajaj', label: 'Bajaj', emoji: '🛺' },
-  { id: 'angkot', label: 'Angkot', emoji: '🚐' },
-  { id: 'pinisi', label: 'Kapal Pinisi', emoji: '⛵' },
-  { id: 'delman', label: 'Delman', emoji: '🐎' },
-  { id: 'bakso', label: 'Gerobak Bakso', emoji: '🍜' },
-  { id: 'ojek', label: 'Motor Ojek', emoji: '🛵' },
-  { id: 'ondel', label: 'Ondel-ondel', emoji: '🎭' },
+  { id: 'becak', label: 'Abang Becak', emoji: '👒', hat: 'caping', skin: '#C68A5B', pants: '#3B4A6B' },
+  { id: 'bajaj', label: 'Bang Bajaj', emoji: '🧢', hat: 'pet', skin: '#B97A4E', pants: '#2F3A2F' },
+  { id: 'angkot', label: 'Sopir Angkot', emoji: '🚐', hat: 'handuk', skin: '#A86B43', pants: '#4A3B2A' },
+  { id: 'pinisi', label: 'Pelaut Pinisi', emoji: '⛵', hat: 'pelaut', skin: '#8E5A36', pants: '#F2F2F2' },
+  { id: 'delman', label: 'Kusir Delman', emoji: '🐎', hat: 'blangkon', skin: '#C99368', pants: '#2B2B2B' },
+  { id: 'bakso', label: 'Mas Bakso', emoji: '🍜', hat: 'bandana', skin: '#D8A57B', pants: '#5A4632' },
+  { id: 'ojek', label: 'Mas Ojek', emoji: '🛵', hat: 'helm', skin: '#B47F57', pants: '#1F2A44' },
+  { id: 'ondel', label: 'Mbak Penari', emoji: '💃', hat: 'sanggul', skin: '#E0B08A', pants: '#7B2D5B' },
 ];
+export const tokenInfo = (id: string) => TOKENS.find((t) => t.id === id) ?? TOKENS[0];
 export const tokenEmoji = (id: string) => TOKENS.find((t) => t.id === id)?.emoji ?? '●';
 
 export const PLAYER_COLORS = ['#C0392B', '#1F5F8B', '#3E8B3A', '#D99A0B', '#7B4FA0', '#D2557F'];
