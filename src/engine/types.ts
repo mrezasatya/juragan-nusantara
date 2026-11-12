@@ -183,7 +183,7 @@ export type Task =
   | { t: 'draw'; player: string; deck: DeckId }
   | { t: 'effect'; player: string; cardId: string }
   | { t: 'releaseCard'; cardId: string }
-  | { t: 'checkLoans'; player: string };
+  | { t: 'leaveJail'; player: string };
 
 export type Prompt =
   | { type: 'buy'; player: string; tile: number }
@@ -230,6 +230,7 @@ export interface GameState {
   current: number; // indeks pemain yang sedang giliran
   round: number;
   phase: Phase;
+  resume: 'preRoll' | 'postRoll'; // fase setelah antrean tugas selesai
   prompt: Prompt | null;
   queue: Task[];
   board: Record<number, OwnershipState>;
@@ -278,6 +279,7 @@ export type Action =
   | { type: 'PAY_DEBT' }
   | { type: 'SURRENDER_PROPERTY'; tile: number }
   | { type: 'DECLARE_BANKRUPTCY' }
+  | { type: 'AUTO_LIQUIDATE' }
   | { type: 'TRADE'; a: string; b: string; aGives: TradeOffer; bGives: TradeOffer }
   | { type: 'LOAN'; lender: string; borrower: string; principal: number; interestPct: number }
   | { type: 'REPAY_LOAN'; loanId: string }
