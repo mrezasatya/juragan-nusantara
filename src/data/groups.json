@@ -1,0 +1,66 @@
+[
+  {
+    "id": "kopi",
+    "name": "Kopi",
+    "color": "#7A4A2A",
+    "region": "Sumatra bagian utara",
+    "motif": "Motif Pintu Aceh & ulos",
+    "buildCost": 50
+  },
+  {
+    "id": "langit",
+    "name": "Langit",
+    "color": "#7EC8E3",
+    "region": "Sumatra bagian tengah-selatan",
+    "motif": "Songket",
+    "buildCost": 50
+  },
+  {
+    "id": "jambu",
+    "name": "Jambu",
+    "color": "#E87CA0",
+    "region": "Jawa bagian barat",
+    "motif": "Batik mega mendung & motif Betawi",
+    "buildCost": 100
+  },
+  {
+    "id": "jeruk",
+    "name": "Jeruk",
+    "color": "#F08A24",
+    "region": "Jawa bagian tengah-timur",
+    "motif": "Batik parang & kawung",
+    "buildCost": 100
+  },
+  {
+    "id": "cabai",
+    "name": "Cabai",
+    "color": "#D32F2F",
+    "region": "Bali & Nusa Tenggara",
+    "motif": "Endek & tenun ikat",
+    "buildCost": 150
+  },
+  {
+    "id": "kunyit",
+    "name": "Kunyit",
+    "color": "#F2C230",
+    "region": "Kalimantan",
+    "motif": "Motif Dayak",
+    "buildCost": 150
+  },
+  {
+    "id": "pandan",
+    "name": "Pandan",
+    "color": "#3E9A4A",
+    "region": "Sulawesi",
+    "motif": "Tenun sutra Bugis & motif pinisi",
+    "buildCost": 200
+  },
+  {
+    "id": "nila",
+    "name": "Nila",
+    "color": "#1F3F8B",
+    "region": "Maluku & Papua",
+    "motif": "Motif ukiran Papua & cengkih-pala",
+    "buildCost": 200
+  }
+]
