@@ -1,0 +1,15 @@
+{
+  "startMoney": 1500,
+  "salary": 200,
+  "arisanFee": 10,
+  "jail": { "tile": 10, "fine": 50, "maxAttempts": 3, "fineTo": "warkop" },
+  "pungli": { "flat": 20, "nego": { "low": 40, "mid": 20, "high": 0 }, "to": "warkop" },
+  "transportRent": [25, 50, 100, 200],
+  "utilityMultiplier": [4, 10],
+  "setRentMultiplier": 2,
+  "mortgageInterest": 0.1,
+  "buildingSellRatio": 0.5,
+  "auction": { "startBid": 10 },
+  "loan": { "maxInterestPct": 10, "dueRounds": 3, "penaltyPct": 10 },
+  "kilat": { "startingProperties": 2, "defaultRounds": 15, "defaultMinutes": 45 }
+}

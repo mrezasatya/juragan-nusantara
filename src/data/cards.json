@@ -1,0 +1,1321 @@
+[
+  {
+    "id": "N01",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Kontenmu Viral!",
+    "text": "Video kamu masak rendang ditonton jutaan orang. Endorse berdatangan.",
+    "effectText": "Terima Rp 50 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 50
+    }
+  },
+  {
+    "id": "N02",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Turis Mancanegara Kepincut",
+    "text": "Homestay-mu dapat ulasan bintang lima: \"Warganya ramah sekali!\"",
+    "effectText": "Terima Rp 30 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 30
+    }
+  },
+  {
+    "id": "N03",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Nobar Final Bulu Tangkis",
+    "text": "Indonesia juara, warung kopimu laris sampai subuh.",
+    "effectText": "Terima Rp 20 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 20
+    }
+  },
+  {
+    "id": "N04",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Pameran Budaya Dunia",
+    "text": "Batik, wayang, dan angklung tampil di panggung internasional.",
+    "effectText": "Maju ke DIY — Malioboro",
+    "effect": {
+      "type": "MOVE_TO",
+      "tile": 16
+    }
+  },
+  {
+    "id": "N05",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Mudik Lancar Jaya",
+    "text": "Jalanan lengang, sampai kampung tepat waktu. Tumben.",
+    "effectText": "Maju ke MULAI, terima gaji",
+    "effect": {
+      "type": "MOVE_TO",
+      "tile": 0
+    }
+  },
+  {
+    "id": "N06",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Panen Raya",
+    "text": "Sawah dan kebun panen melimpah.",
+    "effectText": "Terima Rp 25 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 25
+    }
+  },
+  {
+    "id": "N07",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Liburan ke Timur",
+    "text": "Saatnya melihat surga di ujung timur.",
+    "effectText": "Maju ke Raja Ampat",
+    "effect": {
+      "type": "MOVE_TO",
+      "tile": 39
+    }
+  },
+  {
+    "id": "N08",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Juara Panjat Pinang 17-an",
+    "text": "Kerja sama tim, hadiahnya dibagi rata.",
+    "effectText": "Terima Rp 15 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 15
+    }
+  },
+  {
+    "id": "N09",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Asuransi Bencana",
+    "text": "Sedia payung sebelum hujan.",
+    "effectText": "Simpan. Batalkan 1 kartu [Bencana]",
+    "effect": {
+      "type": "KEEP_ITEM",
+      "item": "disaster_shield"
+    }
+  },
+  {
+    "id": "N10",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Desa Wisata Terbaik",
+    "text": "Kampungmu dinobatkan sebagai desa wisata terbaik.",
+    "effectText": "Terima Rp 40 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 40
+    }
+  },
+  {
+    "id": "N11",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "UMKM Naik Kelas",
+    "text": "Keripik buatanmu tembus pasar ekspor.",
+    "effectText": "Terima Rp 60 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 60
+    }
+  },
+  {
+    "id": "N12",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Jalan Tol Baru Diresmikan",
+    "text": "Perjalanan antarkota jadi jauh lebih cepat.",
+    "effectText": "Maju 4 petak",
+    "effect": {
+      "type": "MOVE_STEPS",
+      "steps": 4
+    }
+  },
+  {
+    "id": "N13",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Menyelam di Bunaken",
+    "text": "Terumbu karangnya bikin lupa pulang.",
+    "effectText": "Maju ke Taman Laut Bunaken",
+    "effect": {
+      "type": "MOVE_TO",
+      "tile": 32
+    }
+  },
+  {
+    "id": "N14",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Festival Kuliner Nusantara",
+    "text": "Stan makananmu antre panjang dari pagi sampai malam.",
+    "effectText": "Terima Rp 35 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 35
+    }
+  },
+  {
+    "id": "N15",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Anak Dapat Beasiswa",
+    "text": "Anakmu lulus seleksi beasiswa penuh. Biaya kuliah aman.",
+    "effectText": "Terima Rp 40 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 40
+    }
+  },
+  {
+    "id": "N16",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Pentas Angklung Keliling Dunia",
+    "text": "Grup angklung kampungmu diundang tampil di luar negeri.",
+    "effectText": "Terima Rp 25 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 25
+    }
+  },
+  {
+    "id": "N17",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Pesta Rakyat",
+    "text": "Pasar malam, panggung hiburan, semua orang gembira.",
+    "effectText": "Semua pemain terima Rp 10 jt",
+    "effect": {
+      "type": "ALL_RECEIVE",
+      "amount": 10
+    }
+  },
+  {
+    "id": "N18",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Pinisi Berlayar",
+    "text": "Ikut pelayaran kapal pinisi menyusuri pesisir.",
+    "effectText": "Maju ke Pantai Losari",
+    "effect": {
+      "type": "MOVE_TO",
+      "tile": 31
+    }
+  },
+  {
+    "id": "N19",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Matahari Terbit di Bromo",
+    "text": "Bangun jam 3 pagi, tapi pemandangannya sepadan.",
+    "effectText": "Maju ke Gunung Bromo",
+    "effect": {
+      "type": "MOVE_TO",
+      "tile": 19
+    }
+  },
+  {
+    "id": "N20",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Kejadian Langka",
+    "text": "Harga BBM turun. Semua orang curiga, tapi senang.",
+    "effectText": "Terima Rp 20 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 20
+    }
+  },
+  {
+    "id": "N21",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Kopi Lokal Juara Dunia",
+    "text": "Biji kopi dari kebunmu menang kompetisi internasional.",
+    "effectText": "Terima Rp 45 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 45
+    }
+  },
+  {
+    "id": "N22",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Pentas Wayang Semalam Suntuk",
+    "text": "Penonton membludak, angkringanmu laku keras.",
+    "effectText": "Terima Rp 20 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 20
+    }
+  },
+  {
+    "id": "N23",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Relawan Tanggap Bencana",
+    "text": "Kamu turun langsung membantu warga terdampak. Perusahaan memberi bonus kepedulian.",
+    "effectText": "Terima Rp 25 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 25
+    }
+  },
+  {
+    "id": "N24",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Spesies Baru Ditemukan",
+    "text": "Peneliti menemukan spesies baru di hutan dekat kampungmu. Ekowisata ramai.",
+    "effectText": "Terima Rp 30 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 30
+    }
+  },
+  {
+    "id": "N25",
+    "deck": "nasib",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Tenun Ikat Mendunia",
+    "text": "Pesanan kain tenun datang dari mancanegara.",
+    "effectText": "Terima Rp 30 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 30
+    }
+  },
+  {
+    "id": "N26",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "KENA OTT!",
+    "text": "Proyek jembatanmu ternyata cuma jadi di gambar.",
+    "effectText": "Langsung masuk Hotel Prodeo, tidak lewat MULAI",
+    "effect": {
+      "type": "GO_TO_JAIL"
+    }
+  },
+  {
+    "id": "N27",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Remisi 17 Agustus",
+    "text": "Berkelakuan baik, katanya.",
+    "effectText": "Simpan. Keluar dari Hotel Prodeo",
+    "effect": {
+      "type": "KEEP_ITEM",
+      "item": "jail_free"
+    }
+  },
+  {
+    "id": "N28",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Macet Total",
+    "text": "Jarak 5 km, waktu tempuh 3 jam.",
+    "effectText": "Diam 1 giliran, atau bayar ojek Rp 5 jt untuk tetap jalan",
+    "effect": {
+      "type": "SKIP_OR_PAY",
+      "amount": 5,
+      "to": "bank"
+    }
+  },
+  {
+    "id": "N29",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [
+      "bencana"
+    ],
+    "title": "Musim Kabut Asap",
+    "text": "Lahan dibakar, asap ke mana-mana, penanganannya nunggu viral dulu.",
+    "effectText": "Mundur 3 petak dan beli masker Rp 5 jt (ke Kas Warkop)",
+    "effect": {
+      "type": "MOVE_STEPS",
+      "steps": -3,
+      "alsoPay": {
+        "amount": 5,
+        "to": "warkop"
+      }
+    }
+  },
+  {
+    "id": "N30",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [
+      "bencana"
+    ],
+    "title": "Banjir Kiriman",
+    "text": "Got mampet, drainase cuma wacana.",
+    "effectText": "Bayar Rp 25 jt per Homestay dan Rp 100 jt per Resort milikmu",
+    "effect": {
+      "type": "PAY_PER_BUILDING",
+      "perHomestay": 25,
+      "perResort": 100,
+      "to": "bank"
+    }
+  },
+  {
+    "id": "N31",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Tilang Motor Lama",
+    "text": "Kena tilang elektronik untuk motor yang sudah dijual 3 tahun lalu.",
+    "effectText": "Bayar Rp 10 jt (ke Kas Warkop)",
+    "effect": {
+      "type": "PAY_WARKOP",
+      "amount": 10
+    }
+  },
+  {
+    "id": "N32",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Harga Cabai Naik Lagi",
+    "text": "Masak sambal sekarang butuh cicilan.",
+    "effectText": "Bayar Rp 15 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 15
+    }
+  },
+  {
+    "id": "N33",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Musim Mudik",
+    "text": "Tiket naik dua kali lipat, calo naik tiga kali lipat.",
+    "effectText": "Maju ke petak transportasi terdekat. Jika dimiliki pemain lain, bayar 2× sewa",
+    "effect": {
+      "type": "MOVE_TO_NEAREST_TRANSPORT",
+      "rentMultiplier": 2
+    }
+  },
+  {
+    "id": "N34",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Proyek Mangkrak",
+    "text": "Tiang beton berdiri sendirian bertahun-tahun, jadi monumen kenangan.",
+    "effectText": "Bayar Rp 40 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 40
+    }
+  },
+  {
+    "id": "N35",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Pembangunan Kejar Tayang",
+    "text": "Jembatan diresmikan hari ini, besok ditutup untuk perbaikan.",
+    "effectText": "Mundur 3 petak",
+    "effect": {
+      "type": "MOVE_STEPS",
+      "steps": -3
+    }
+  },
+  {
+    "id": "N36",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [
+      "bencana"
+    ],
+    "title": "Tanah Longsor",
+    "text": "Hutan di bukit sudah berganti vila.",
+    "effectText": "Bayar Rp 15 jt per Homestay dan Rp 60 jt per Resort milikmu",
+    "effect": {
+      "type": "PAY_PER_BUILDING",
+      "perHomestay": 15,
+      "perResort": 60,
+      "to": "bank"
+    }
+  },
+  {
+    "id": "N37",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Sungai Jadi Tempat Sampah",
+    "text": "Kamu ketahuan buang sampah ke sungai. Pantas tiap tahun banjir.",
+    "effectText": "Bayar denda Rp 15 jt (ke Kas Warkop)",
+    "effect": {
+      "type": "PAY_WARKOP",
+      "amount": 15
+    }
+  },
+  {
+    "id": "N38",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Baliho di Mana-mana",
+    "text": "Papan penunjuk jalan tertutup baliho raksasa. Kamu nyasar.",
+    "effectText": "Mundur 2 petak",
+    "effect": {
+      "type": "MOVE_STEPS",
+      "steps": -2
+    }
+  },
+  {
+    "id": "N39",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Tender Sudah Ada Pemenangnya",
+    "text": "Kamu ikut tender, ternyata pemenangnya sudah diketahui sebelum dibuka.",
+    "effectText": "Biaya proposal hangus, bayar Rp 20 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 20
+    }
+  },
+  {
+    "id": "N40",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Mark-up Ketahuan",
+    "text": "Harga kursi kantor di laporan setara harga mobil.",
+    "effectText": "Kembalikan kelebihan, bayar Rp 50 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 50
+    }
+  },
+  {
+    "id": "N41",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Studi Banding (Katanya)",
+    "text": "Agendanya rapat satu jam, belanjanya tiga hari.",
+    "effectText": "Maju ke Bandara. Jika dimiliki pemain lain, bayar sewa",
+    "effect": {
+      "type": "MOVE_TO",
+      "tile": 35
+    }
+  },
+  {
+    "id": "N42",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Tukang Parkir Gaib",
+    "text": "Datang tidak ada, pergi tiba-tiba muncul: \"Terus, terus, kiri!\"",
+    "effectText": "Bayar Rp 5 jt (ke Kas Warkop)",
+    "effect": {
+      "type": "PAY_WARKOP",
+      "amount": 5
+    }
+  },
+  {
+    "id": "N43",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Tiket Domestik Lebih Mahal",
+    "text": "Terbang ke pulau sebelah lebih mahal daripada ke luar negeri.",
+    "effectText": "Bayar Rp 25 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 25
+    }
+  },
+  {
+    "id": "N44",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Solar Langka",
+    "text": "Antre di pom bensin dari subuh, dapatnya setengah tangki.",
+    "effectText": "Diam 1 giliran",
+    "effect": {
+      "type": "SKIP_TURN"
+    }
+  },
+  {
+    "id": "N45",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Rapat Koordinasi ke-17",
+    "text": "Rapat penanganan bencana untuk membahas jadwal rapat berikutnya.",
+    "effectText": "Diam 1 giliran",
+    "effect": {
+      "type": "SKIP_TURN"
+    }
+  },
+  {
+    "id": "N46",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Tarif Naik, Layanan Tetap",
+    "text": "Biaya naik terus, pelayanannya begitu-begitu saja.",
+    "effectText": "Bayar Rp 30 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 30
+    }
+  },
+  {
+    "id": "N47",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Satu Tanah Dua Sertifikat",
+    "text": "Tanahmu ternyata punya \"kembaran\" di kantor lain.",
+    "effectText": "Bayar biaya sengketa Rp 30 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 30
+    }
+  },
+  {
+    "id": "N48",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Galian Bolak-balik",
+    "text": "Jalan digali untuk kabel, ditutup, lalu digali lagi untuk pipa.",
+    "effectText": "Bayar Rp 10 jt untuk ban bocor",
+    "effect": {
+      "type": "PAY",
+      "amount": 10
+    }
+  },
+  {
+    "id": "N49",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Destinasi Indah, Sinyal Hilang",
+    "text": "Tamu batal menginap karena tidak bisa unggah foto.",
+    "effectText": "Bayar Rp 15 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 15
+    }
+  },
+  {
+    "id": "N50",
+    "deck": "nasib",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Iklan Pinjol Menggoda",
+    "text": "\"Cair 5 menit, tanpa jaminan!\" Bunganya tidak bilang-bilang.",
+    "effectText": "Terima Rp 50 jt sekarang, bayar Rp 75 jt saat lewat MULAI berikutnya (efek tertunda)",
+    "effect": {
+      "type": "DEFERRED_PAY",
+      "receive": 50,
+      "pay": 75,
+      "trigger": "pass_start"
+    }
+  },
+  {
+    "id": "W01",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Kerja Bakti",
+    "text": "Satu RT turun tangan membantu warga yang sedang susah.",
+    "effectText": "Pemain dengan uang paling sedikit menerima Rp 10 jt dari setiap pemain lain",
+    "effect": {
+      "type": "POOREST_RECEIVE_FROM_ALL",
+      "amount": 10
+    }
+  },
+  {
+    "id": "W02",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Narik Arisan!",
+    "text": "Namamu keluar di kocokan arisan.",
+    "effectText": "Ambil semua isi Kas Arisan",
+    "effect": {
+      "type": "TAKE_ARISAN"
+    }
+  },
+  {
+    "id": "W03",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Kamu Hajatan",
+    "text": "Tetangga datang membawa amplop dan doa terbaik.",
+    "effectText": "Terima Rp 10 jt dari setiap pemain",
+    "effect": {
+      "type": "RECEIVE_FROM_ALL",
+      "amount": 10
+    }
+  },
+  {
+    "id": "W04",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Tetangga Antar Makanan",
+    "text": "Tetangga masak besar dan kamu kebagian. Hemat belanja seminggu.",
+    "effectText": "Terima Rp 10 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 10
+    }
+  },
+  {
+    "id": "W05",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Dapat THR",
+    "text": "Tunjangan hari raya cair tepat waktu.",
+    "effectText": "Terima Rp 50 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 50
+    }
+  },
+  {
+    "id": "W06",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Oleh-oleh Laris",
+    "text": "Jualan oleh-oleh khas daerah habis diborong.",
+    "effectText": "Terima Rp 20 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 20
+    }
+  },
+  {
+    "id": "W07",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Kampung Juara Kebersihan",
+    "text": "Hasil gotong royong warga satu kampung.",
+    "effectText": "Terima Rp 25 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 25
+    }
+  },
+  {
+    "id": "W08",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "SHU Koperasi Cair",
+    "text": "Sisa hasil usaha koperasi dibagikan ke anggota.",
+    "effectText": "Terima Rp 30 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 30
+    }
+  },
+  {
+    "id": "W09",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Siskamling Sukses",
+    "text": "Ronda malam rutin, kampung aman, tidak perlu sewa satpam.",
+    "effectText": "Terima Rp 15 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 15
+    }
+  },
+  {
+    "id": "W10",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Kader Posyandu Teladan",
+    "text": "Balita di kampungmu sehat semua.",
+    "effectText": "Terima penghargaan Rp 15 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 15
+    }
+  },
+  {
+    "id": "W11",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Pindahan Dibantu Satu Gang",
+    "text": "Tidak perlu sewa jasa angkut, tetangga turun semua.",
+    "effectText": "Terima Rp 20 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 20
+    }
+  },
+  {
+    "id": "W12",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Juara Balap Karung",
+    "text": "Latihan di gang ternyata membuahkan hasil.",
+    "effectText": "Terima Rp 10 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 10
+    }
+  },
+  {
+    "id": "W13",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Liwetan Bersama",
+    "text": "Makan bersama di atas daun pisang, semua kenyang.",
+    "effectText": "Semua pemain terima Rp 5 jt",
+    "effect": {
+      "type": "ALL_RECEIVE",
+      "amount": 5
+    }
+  },
+  {
+    "id": "W14",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Tabungan Bank Sampah Cair",
+    "text": "Rajin memilah sampah ternyata menguntungkan.",
+    "effectText": "Terima Rp 15 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 15
+    }
+  },
+  {
+    "id": "W15",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Anak Juara Olimpiade Sains",
+    "text": "Anak tetangga belajar bareng anakmu, dua-duanya juara.",
+    "effectText": "Terima Rp 30 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 30
+    }
+  },
+  {
+    "id": "W16",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Bon Warung Diputihkan",
+    "text": "Bu warung menghapus catatan bonmu karena kamu rajin membantu.",
+    "effectText": "Terima Rp 10 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 10
+    }
+  },
+  {
+    "id": "W17",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Ojek Langganan Jujur",
+    "text": "Dompetmu ketinggalan di motor, dikembalikan utuh.",
+    "effectText": "Terima Rp 20 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 20
+    }
+  },
+  {
+    "id": "W18",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Gotong Royong Bedah Rumah",
+    "text": "Warga bergotong royong merenovasi rumahmu.",
+    "effectText": "Bangun 1 Homestay gratis di grup warna lengkap milikmu. Jika tidak punya, terima Rp 30 jt",
+    "effect": {
+      "type": "FREE_BUILDING",
+      "fallbackAmount": 30
+    }
+  },
+  {
+    "id": "W19",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Warisan Kebun Durian",
+    "text": "Kakek mewariskan kebun yang sedang musim panen.",
+    "effectText": "Terima Rp 40 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 40
+    }
+  },
+  {
+    "id": "W20",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Juara Masak Nasi Goreng",
+    "text": "Lomba antar-RT, resep rahasia keluarga menang telak.",
+    "effectText": "Terima Rp 15 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 15
+    }
+  },
+  {
+    "id": "W21",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Reuni Bawa Rezeki",
+    "text": "Teman lama mengajak kerja sama bisnis.",
+    "effectText": "Terima Rp 35 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 35
+    }
+  },
+  {
+    "id": "W22",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Gotong Royong Panen",
+    "text": "Tetangga membantu panen, upah buruh hemat.",
+    "effectText": "Terima Rp 20 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 20
+    }
+  },
+  {
+    "id": "W23",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Kampung Bebas Banjir",
+    "text": "Warga rutin membersihkan selokan. Hujan deras pun aman.",
+    "effectText": "Simpan sebagai Asuransi Bencana. Batalkan 1 kartu [Bencana]",
+    "effect": {
+      "type": "KEEP_ITEM",
+      "item": "disaster_shield"
+    }
+  },
+  {
+    "id": "W24",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Promo Tanggal Kembar",
+    "text": "Kebutuhan rumah tangga diskon setengah harga.",
+    "effectText": "Terima Rp 10 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 10
+    }
+  },
+  {
+    "id": "W25",
+    "deck": "warga",
+    "side": "kebaikan",
+    "tags": [],
+    "title": "Silaturahmi Keliling Kampung",
+    "text": "Perut kenyang, hubungan makin erat, dompet tetap utuh.",
+    "effectText": "Terima Rp 10 jt",
+    "effect": {
+      "type": "RECEIVE",
+      "amount": 10
+    }
+  },
+  {
+    "id": "W26",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Kartu Orang Dalam",
+    "text": "\"Tenang, saya kenal orangnya.\"",
+    "effectText": "Simpan. Keluar dari Hotel Prodeo atau lolos Pos Pungli",
+    "effect": {
+      "type": "KEEP_ITEM",
+      "item": "orang_dalam"
+    }
+  },
+  {
+    "id": "W27",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Utang Ditagih di Grup Chat RT",
+    "text": "Lupa bayar utang ke tetangga, sekarang satu RT tahu.",
+    "effectText": "Bayar Rp 20 jt ke pemain di sebelah kirimu",
+    "effect": {
+      "type": "PAY_TO_PLAYER",
+      "amount": 20,
+      "target": "left"
+    }
+  },
+  {
+    "id": "W28",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Bansos Salah Sasaran",
+    "text": "Bansos cair. Tapi, eh, kok kamu dapat?",
+    "effectText": "Terima Rp 25 jt. Jika uangmu di atas Rp 1 M, kembalikan dan bayar denda malu Rp 25 jt (ke Kas Warkop)",
+    "effect": {
+      "type": "CONDITIONAL_WEALTH",
+      "receive": 25,
+      "threshold": 1000,
+      "penalty": 25,
+      "penaltyTo": "warkop"
+    }
+  },
+  {
+    "id": "W29",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Urus KTP: \"Sistem Offline\"",
+    "text": "\"Datang lagi besok ya, Pak/Bu.\"",
+    "effectText": "Diam 1 giliran",
+    "effect": {
+      "type": "SKIP_TURN"
+    }
+  },
+  {
+    "id": "W30",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Kondangan 3 Kali Seminggu",
+    "text": "Undangan datang beruntun, gaji belum turun.",
+    "effectText": "Bayar amplop Rp 15 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 15
+    }
+  },
+  {
+    "id": "W31",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Pemadaman Bergilir",
+    "text": "Listrik padam pas lagi rapat online.",
+    "effectText": "Bayar sewa genset Rp 10 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 10
+    }
+  },
+  {
+    "id": "W32",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Iuran Tak Terduga",
+    "text": "Iuran 17-an, iuran ronda, iuran sampah, iuran entah apa.",
+    "effectText": "Bayar Rp 10 jt (ke Kas Warkop)",
+    "effect": {
+      "type": "PAY_WARKOP",
+      "amount": 10
+    }
+  },
+  {
+    "id": "W33",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "No Viral No Justice",
+    "text": "Laporan jalan rusakmu tidak ditanggapi.",
+    "effectText": "Lempar dadu. Genap: viral, langsung diperbaiki, terima kompensasi Rp 20 jt. Ganjil: tetap diabaikan, bayar kuota Rp 5 jt",
+    "effect": {
+      "type": "DICE_OUTCOME",
+      "even": {
+        "receive": 20
+      },
+      "odd": {
+        "pay": 5,
+        "to": "bank"
+      }
+    }
+  },
+  {
+    "id": "W34",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Panci Dipinjam Setahun",
+    "text": "Tetangga pinjam panci, kembalinya entah kapan.",
+    "effectText": "Beli panci baru, bayar Rp 5 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 5
+    }
+  },
+  {
+    "id": "W35",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Hoaks di Grup Keluarga",
+    "text": "Kamu ikut menyebarkan info palsu, sekarang sibuk klarifikasi.",
+    "effectText": "Diam 1 giliran",
+    "effect": {
+      "type": "SKIP_TURN"
+    }
+  },
+  {
+    "id": "W36",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Gerbang Dihalangi Mobil Tetangga",
+    "text": "Mobil tetangga parkir pas di depan gerbangmu.",
+    "effectText": "Naik ojek, bayar Rp 5 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 5
+    }
+  },
+  {
+    "id": "W37",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Hajatan Sampai Subuh",
+    "text": "Sound system tetangga menggelegar sampai pagi. Kamu kurang tidur.",
+    "effectText": "Mundur 2 petak",
+    "effect": {
+      "type": "MOVE_STEPS",
+      "steps": -2
+    }
+  },
+  {
+    "id": "W38",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Iuran Sampah, Sampahnya Menginap",
+    "text": "Iuran rutin dibayar, sampahnya tidak diangkut seminggu.",
+    "effectText": "Bayar Rp 10 jt (ke Kas Warkop)",
+    "effect": {
+      "type": "PAY_WARKOP",
+      "amount": 10
+    }
+  },
+  {
+    "id": "W39",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "\"Pinjam Seratus Dulu\"",
+    "text": "Teman lama tiba-tiba chat setelah 5 tahun menghilang.",
+    "effectText": "Bayar Rp 10 jt ke pemain dengan uang paling sedikit",
+    "effect": {
+      "type": "PAY_TO_PLAYER",
+      "amount": 10,
+      "target": "poorest"
+    }
+  },
+  {
+    "id": "W40",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Debt Collector Salah Alamat",
+    "text": "Yang berutang siapa, yang ditagih siapa.",
+    "effectText": "Diam 1 giliran",
+    "effect": {
+      "type": "SKIP_TURN"
+    }
+  },
+  {
+    "id": "W41",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Surat Pengantar Berputar",
+    "text": "Dari RT ke RW ke kelurahan, kembali lagi ke RT karena stempel kurang.",
+    "effectText": "Pindah ke MULAI tanpa menerima gaji",
+    "effect": {
+      "type": "MOVE_TO_NO_SALARY",
+      "tile": 0
+    }
+  },
+  {
+    "id": "W42",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Fotokopi 10 Rangkap",
+    "text": "Katanya sudah serba digital.",
+    "effectText": "Bayar Rp 5 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 5
+    }
+  },
+  {
+    "id": "W43",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Uang Keamanan \"Oknum\"",
+    "text": "Kios barumu didatangi \"penjaga lingkungan\" tak dikenal.",
+    "effectText": "Bayar Rp 15 jt (ke Kas Warkop)",
+    "effect": {
+      "type": "PAY_WARKOP",
+      "amount": 15
+    }
+  },
+  {
+    "id": "W44",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Ikut-ikutan Flexing",
+    "text": "Tetangga pamer mobil baru (kredit). Kamu tidak mau kalah.",
+    "effectText": "Bayar Rp 30 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 30
+    }
+  },
+  {
+    "id": "W45",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Arisan Bodong",
+    "text": "Bandar arisan menghilang bersama uangnya.",
+    "effectText": "Seluruh isi Kas Arisan hangus (kembali ke Bank)",
+    "effect": {
+      "type": "CLEAR_ARISAN"
+    }
+  },
+  {
+    "id": "W46",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Investasi Bodong",
+    "text": "Dijanjikan untung 30% per bulan, tanpa risiko.",
+    "effectText": "Bayar Rp 50 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 50
+    }
+  },
+  {
+    "id": "W47",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Jam Karet Rapat RT",
+    "text": "Undangan jam 7, mulai jam 9, selesai jam 11.",
+    "effectText": "Mundur 3 petak",
+    "effect": {
+      "type": "MOVE_STEPS",
+      "steps": -3
+    }
+  },
+  {
+    "id": "W48",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Antre Berobat dari Subuh",
+    "text": "Dapat nomor antrean 187.",
+    "effectText": "Diam 1 giliran",
+    "effect": {
+      "type": "SKIP_TURN"
+    }
+  },
+  {
+    "id": "W49",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Servis \"Cuma Ganti Kabel\"",
+    "text": "Tagihannya kok seharga barang baru?",
+    "effectText": "Bayar Rp 15 jt",
+    "effect": {
+      "type": "PAY",
+      "amount": 15
+    }
+  },
+  {
+    "id": "W50",
+    "deck": "warga",
+    "side": "sindiran",
+    "tags": [],
+    "title": "Dipilih Jadi Panitia Saat Absen",
+    "text": "Tidak datang rapat, terpilih secara aklamasi, wajib menalangi dana.",
+    "effectText": "Bayar Rp 20 jt (ke Kas Warkop)",
+    "effect": {
+      "type": "PAY_WARKOP",
+      "amount": 20
+    }
+  }
+]
