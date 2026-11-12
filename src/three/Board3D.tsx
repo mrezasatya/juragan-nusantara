@@ -263,7 +263,7 @@ export default function Board3D(props: Props) {
   const { game, onSwitch2D } = props;
   const [resetTick, setResetTick] = useState(0);
   const [lost, setLost] = useState(false);
-  const total = game.lastDice ? game.lastDice[0] + game.lastDice[1] : null;
+  const dice = game.lastDice;
 
   if (lost)
     return (
@@ -317,7 +317,12 @@ export default function Board3D(props: Props) {
           2D
         </button>
       </div>
-      {total !== null && !props.rolling && <div className="hud-dice">🎲 {total}</div>}
+      {dice && !props.rolling && (
+        <div className="hud-dice" aria-live="polite">
+          🎲 {dice[0]} + {dice[1]} = {dice[0] + dice[1]}
+          {dice[0] === dice[1] ? ' · DOBEL!' : ''}
+        </div>
+      )}
       <div className="hud-hint">Seret untuk memutar · cubit/scroll untuk zoom · ketuk petak untuk info</div>
     </div>
   );

@@ -31,7 +31,7 @@ function restingQuat(value: number, yaw: number) {
   return spin.multiply(align);
 }
 
-const SIZE = 0.44;
+const SIZE = 0.52;
 const REST_Y = 0.16 + SIZE / 2;
 const DURATION = 1.25;
 
@@ -44,7 +44,7 @@ function Die({ value, rollId, index, onLanded }: { value: number; rollId: number
   const anim = useRef({
     t: 1,
     start: new THREE.Vector3(),
-    end: new THREE.Vector3(index ? 0.42 : -0.42, REST_Y, 1.2),
+    end: new THREE.Vector3(index ? 0.45 : -0.45, REST_Y, 2.45),
     axis: new THREE.Vector3(1, 0, 0),
     speed: 0,
     q: restingQuat(value, index ? 0.4 : -0.3),
@@ -56,8 +56,9 @@ function Die({ value, rollId, index, onLanded }: { value: number; rollId: number
     if (!rollId) return;
     const a = anim.current;
     const side = index ? 1 : -1;
-    a.start.set(side * 2.2, 2.6, 3.2);
-    a.end.set(side * 0.42 + (Math.random() - 0.5) * 0.3, REST_Y, 1.0 + (Math.random() - 0.5) * 0.4);
+    // Dilempar dari depan-atas, mendarat di area kosong terdepan (paling dekat kamera)
+    a.start.set(side * 2.0, 2.8, 4.6);
+    a.end.set(side * 0.45 + (Math.random() - 0.5) * 0.2, REST_Y, 2.45 + (Math.random() - 0.5) * 0.2);
     a.axis.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
     a.speed = 14 + Math.random() * 6;
     a.qEnd = restingQuat(value, (Math.random() - 0.5) * 1.2);

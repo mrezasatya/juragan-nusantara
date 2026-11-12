@@ -129,20 +129,18 @@ export function CenterSea() {
       </mesh>
       {/* Pulau-pulau besar Nusantara (stilisasi, barat → timur) */}
       <Island p={[-3.2, -1.6]} s={[1.1, 0.42]} rot={-0.6} trees={2} />
-      <Island p={[-1.5, -0.3]} s={[1.0, 0.25]} rot={-0.08} trees={1} />
+      <Island p={[-1.6, -0.95]} s={[1.0, 0.25]} rot={-0.08} trees={1} />
       <Island p={[-0.9, -2.4]} s={[0.85, 0.75]} trees={2} />
       <Island p={[1.0, -1.6]} s={[0.45, 0.6]} rot={0.4} trees={1} />
-      <Island p={[1.2, 0.1]} s={[0.6, 0.18]} rot={0.05} trees={0} />
+      <Island p={[0.9, -0.55]} s={[0.6, 0.18]} rot={0.05} trees={0} />
       <Island p={[3.2, -1.2]} s={[1.0, 0.5]} rot={0.15} trees={2} />
       <Island p={[2.2, -0.6]} s={[0.25, 0.15]} trees={0} />
-      <Pinisi radius={1.8} speed={0.3} center={[0, 1.6]} />
-      {/* Logo papan nama */}
-      <group position={[0, 0, 2.2]} rotation={[-0.55, 0, 0]}>
-        <mesh position={[0, 0.85, 0]}>
-          <planeGeometry args={[4.6, 1.8]} />
-          <meshBasicMaterial map={logo} transparent toneMapped={false} />
-        </mesh>
-      </group>
+      <Pinisi radius={1.2} speed={0.3} center={[1.8, -3.3]} />
+      {/* Logo dibaringkan rata di atas laut supaya tidak menutupi dadu dari sudut kamera mana pun */}
+      <mesh position={[0, 0.1, 0.75]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[5.2, 2.03]} />
+        <meshBasicMaterial map={logo} transparent toneMapped={false} depthWrite={false} />
+      </mesh>
       {/* Tumpukan kartu */}
       <CardStack p={[-1.1, 3.0]} map={nasib} rot={0.2} />
       <CardStack p={[1.1, 3.0]} map={warga} rot={-0.2} />

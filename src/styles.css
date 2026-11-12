@@ -1806,3 +1806,12 @@ h3 {
   font-weight: 800;
   color: var(--jati);
 }
+.hud-dice {
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .hud-dice {
+    font-size: 1rem;
+    bottom: 10px;
+  }
+}
