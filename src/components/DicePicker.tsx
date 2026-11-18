@@ -1,8 +1,19 @@
 import { useState } from 'react';
 import { Die } from './Art.tsx';
+import { cryptoDie } from '../ui/storage.ts';
 
-/** Input angka dadu fisik (Mode Dadu Fisik). */
-export function DicePicker({ count, onDone, label }: { count: 1 | 2; onDone: (d: number[]) => void; label?: string }) {
+/** Input angka dari dadu sungguhan di meja, dengan jalan pintas acak otomatis. */
+export function DicePicker({
+  count,
+  onDone,
+  label,
+  onSwitchAuto,
+}: {
+  count: 1 | 2;
+  onDone: (d: number[]) => void;
+  label?: string;
+  onSwitchAuto?: () => void;
+}) {
   const [vals, setVals] = useState<(number | null)[]>(Array(count).fill(null));
   const ready = vals.every((v) => v !== null);
   return (
@@ -28,6 +39,16 @@ export function DicePicker({ count, onDone, label }: { count: 1 | 2; onDone: (d:
       <button className="btn btn-primary" disabled={!ready} onClick={() => onDone(vals as number[])}>
         {ready && count === 2 ? `Jalan ${(vals[0] ?? 0) + (vals[1] ?? 0)} petak` : 'OK'}
       </button>
+      <div className="dice-picker-auto">
+        <button className="btn" onClick={() => onDone(Array.from({ length: count }, () => cryptoDie()))}>
+          🎲 Acak otomatis saja
+        </button>
+        {onSwitchAuto && (
+          <button className="btn btn-ghost btn-sm" onClick={onSwitchAuto}>
+            Selalu acak otomatis mulai sekarang
+          </button>
+        )}
+      </div>
     </div>
   );
 }

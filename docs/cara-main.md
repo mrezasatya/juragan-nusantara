@@ -35,8 +35,8 @@ Juragan Nusantara adalah board game properti bertema Indonesia untuk **2–6 pem
 
 ## Dadu
 
-- **Dadu digital:** tekan tombol **Lempar Dadu**. Angka diacak oleh pengacak kriptografis bawaan browser, sehingga peluang setiap angka sama.
-- **Dadu fisik:** lempar dadu sungguhan di meja, lalu masukkan angkanya di aplikasi. Pilih mode ini saat membuat permainan.
+- **Dadu acak otomatis (bawaan):** tekan tombol **Lempar Dadu**. Angka diacak oleh pengacak kriptografis bawaan browser, sehingga peluang setiap angka sama.
+- **Dadu sungguhan di meja (opsional):** lempar dadu asli di meja, lalu pilih angkanya di aplikasi. Pilih mode ini saat membuat permainan. Di layar input angka selalu ada tombol **Acak otomatis saja**, dan mode bisa diganti kapan saja lewat **Menu**.
 - **Dobel** (kedua dadu sama): lempar lagi setelah aksi selesai.
 - **Dobel 3 kali berturut-turut:** langsung masuk Hotel Prodeo. *"Ngebut terus, dicurigai."*
 

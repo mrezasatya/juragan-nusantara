@@ -30,7 +30,7 @@ const SLIDES = [
         <p>
           <strong>Dobel?</strong> Lempar lagi. Dobel 3 kali berturut-turut = masuk Hotel Prodeo ("Ngebut terus, dicurigai").
         </p>
-        <p className="small muted">Main pakai dadu sungguhan? Pilih "Dadu fisik" saat membuat permainan, lalu masukkan angkanya.</p>
+        <p className="small muted">Dadu diacak otomatis oleh aplikasi. Punya dadu asli dan ingin melemparnya di meja? Pilih "Pakai dadu sungguhan di meja" saat membuat permainan.</p>
       </>
     ),
   },

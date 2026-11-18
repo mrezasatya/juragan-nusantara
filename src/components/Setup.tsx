@@ -33,7 +33,8 @@ const DEFAULT: SetupState = {
 };
 
 export default function Setup({ onBack, onStart }: Props) {
-  const [st, setSt] = useState<SetupState>(() => ({ ...DEFAULT, ...(loadSetup<SetupState>() ?? {}) }));
+  // Nama, pion, dan mode diingat; mode dadu TIDAK diingat, selalu mulai dari acak otomatis.
+  const [st, setSt] = useState<SetupState>(() => ({ ...DEFAULT, ...(loadSetup<SetupState>() ?? {}), diceMode: 'digital' }));
   const set = (patch: Partial<SetupState>) => setSt((s) => ({ ...s, ...patch }));
 
   const setName = (i: number, v: string) => set({ names: st.names.map((n, j) => (j === i ? v : n)) });
@@ -159,12 +160,12 @@ export default function Setup({ onBack, onStart }: Props) {
         <h2>Dadu</h2>
         <div className="mode-cards">
           <button className={`mode-card ${st.diceMode === 'digital' ? 'on' : ''}`} onClick={() => set({ diceMode: 'digital' })}>
-            <strong>📱 Dadu digital</strong>
-            <span>Tekan tombol "Lempar Dadu". Angka diacak oleh browser secara adil.</span>
+            <strong>🎲 Dadu acak otomatis</strong>
+            <span>Tekan "Lempar Dadu", aplikasi mengacak angkanya secara adil. Pilihan yang disarankan.</span>
           </button>
           <button className={`mode-card ${st.diceMode === 'fisik' ? 'on' : ''}`} onClick={() => set({ diceMode: 'fisik' })}>
-            <strong>🎲 Dadu fisik</strong>
-            <span>Lempar dadu sungguhan, lalu masukkan angkanya. Cocok untuk main bareng di meja.</span>
+            <strong>✋ Pakai dadu sungguhan di meja</strong>
+            <span>Hanya jika kamu punya dadu asli: lempar di meja, lalu ketik angkanya di aplikasi.</span>
           </button>
         </div>
       </section>

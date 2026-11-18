@@ -500,3 +500,15 @@ describe('Konfigurasi dipakai engine', () => {
     expect(CONFIG.loan.dueRounds).toBe(3);
   });
 });
+
+describe('Mode dadu', () => {
+  it('bisa diganti di tengah permainan tanpa mengubah aturan', () => {
+    let s = newGame();
+    expect(s.diceMode).toBe('digital');
+    s = act(s, { type: 'SET_DICE_MODE', mode: 'fisik' });
+    expect(s.diceMode).toBe('fisik');
+    s = act(s, { type: 'SET_DICE_MODE', mode: 'digital' }, { type: 'ROLL' });
+    expect(s.diceMode).toBe('digital');
+    expect(s.lastDice).not.toBeNull();
+  });
+});

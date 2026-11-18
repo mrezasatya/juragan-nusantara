@@ -12,7 +12,7 @@ Proyek hiburan non-komersial. Spesifikasi lengkap ada di [`docs/konsep-game-jura
 - **Mode Klasik** (menang jika semua lawan bangkrut) dan **Mode Kilat** (batas putaran atau waktu, pemenang = total aset terbesar).
 - 40 petak, 22 provinsi, dan 100 kartu sesuai dokumen konsep, termasuk Kas Warkop, Kas Arisan, Pos Pungli, Hotel Prodeo, kartu simpan, kartu [Bencana], dan efek tertunda.
 - Lelang, jual-beli antarpemain, utang ke tetangga, gadai, dan bangun merata.
-- Dadu digital (pengacak kriptografis browser) atau **dadu fisik** (masukkan angka dari dadu sungguhan).
+- Dadu **acak otomatis** (bawaan, pengacak kriptografis browser) atau, opsional, **dadu sungguhan di meja** (pemain memasukkan angkanya). Mode dadu bisa diganti di tengah permainan lewat Menu.
 - Tutorial singkat, halaman Cara Main, dan detail setiap petak saat disentuh.
 - Simpan otomatis ke browser. Permainan bisa dilanjutkan setelah browser ditutup.
 - Responsif dari lebar 360px sampai layar proyektor.

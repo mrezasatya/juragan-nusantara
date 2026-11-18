@@ -1859,3 +1859,11 @@ h3 {
     opacity: 0;
   }
 }
+.dice-picker-auto {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  border-top: 1px dashed var(--line);
+  padding-top: 0.7rem;
+}

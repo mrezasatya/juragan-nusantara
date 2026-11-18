@@ -248,12 +248,18 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
       {panel === 'trade' && <TradeModal game={game} dispatch={dispatch} onClose={() => setPanel(null)} />}
       {panel === 'loan' && <LoanModal game={game} dispatch={dispatch} onClose={() => setPanel(null)} />}
       {pickDice && (
-        <Modal title="Masukkan angka dadu fisik" onClose={() => setPickDice(false)}>
+        <Modal title="Masukkan angka dadu sungguhan" onClose={() => setPickDice(false)}>
           <DicePicker
             count={2}
+            label="Lempar dadu di meja, lalu pilih angka yang keluar. Tidak punya dadu? Tekan Acak otomatis."
             onDone={(d) => {
               setPickDice(false);
               throwDice([d[0], d[1]]);
+            }}
+            onSwitchAuto={() => {
+              dispatch({ type: 'SET_DICE_MODE', mode: 'digital' });
+              setPickDice(false);
+              throwDice([cryptoDie(), cryptoDie()]);
             }}
           />
         </Modal>
@@ -273,6 +279,15 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
                 🎮 Ganti ke tampilan 3D{supportsWebGL() ? '' : ' (tidak didukung perangkat ini)'}
               </button>
             )}
+            <button
+              className="btn"
+              onClick={() => {
+                dispatch({ type: 'SET_DICE_MODE', mode: physical ? 'digital' : 'fisik' });
+                setPanel(null);
+              }}
+            >
+              {physical ? '🎲 Ganti ke dadu acak otomatis' : '✋ Ganti ke dadu sungguhan di meja'}
+            </button>
             <button className="btn" onClick={onHome}>
               🏠 Ke Beranda (permainan tersimpan)
             </button>

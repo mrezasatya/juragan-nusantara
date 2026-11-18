@@ -25,13 +25,19 @@ export default function PromptModal({ game, dispatch, onManage }: Props) {
 
   if (pick)
     return (
-      <Modal title="Masukkan angka 1 dadu fisik">
+      <Modal title="Masukkan angka 1 dadu sungguhan">
         <DicePicker
           count={1}
           onDone={(d) => {
             const f = pick;
             setPick(null);
             f(d[0]);
+          }}
+          onSwitchAuto={() => {
+            const f = pick;
+            dispatch({ type: 'SET_DICE_MODE', mode: 'digital' });
+            setPick(null);
+            f(cryptoDie());
           }}
         />
       </Modal>

@@ -93,7 +93,7 @@ async function newGame(page, { mode, dice, rounds, view = '3d' }) {
     await page.getByRole('button', { name: /Kilat/ }).click();
     await page.locator('.kilat-opts input').fill(String(rounds));
   }
-  if (dice === 'fisik') await page.getByRole('button', { name: /Dadu fisik/ }).click();
+  if (dice === 'fisik') await page.getByRole('button', { name: /dadu sungguhan/i }).click();
   await page.getByRole('button', { name: /Mulai Main/ }).click();
   await page.getByRole('button', { name: /Lempar Dadu|Masukkan Dadu/ }).waitFor();
 }
@@ -134,11 +134,11 @@ try {
     if (before !== after || logBefore !== logAfter) throw new Error(`Simpan otomatis gagal: "${before}" vs "${after}"`);
     log(`${viewport.width}px: lanjutkan setelah reload OK (${after?.trim()})`);
 
-    // 3) Mode dadu fisik, sekaligus uji tampilan 2D (ringan)
+    // 3) Mode dadu sungguhan di meja, sekaligus uji tampilan 2D (ringan)
     await newGame(page, { mode: 'kilat', dice: 'fisik', rounds: 2, view: '2d' });
     await page.locator('.board').waitFor();
     const steps2 = await playUntilOver(page, 800);
-    log(`${viewport.width}px: permainan dengan dadu fisik selesai dalam ${steps2} langkah UI`);
+    log(`${viewport.width}px: permainan dengan dadu sungguhan selesai dalam ${steps2} langkah UI`);
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
     if (overflow) throw new Error(`Ada scroll horizontal di lebar ${viewport.width}px`);
