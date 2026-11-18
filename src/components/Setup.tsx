@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CONFIG } from '../engine/data.ts';
 import type { NewGameOptions } from '../engine/engine.ts';
 import type { DiceMode, GameMode } from '../engine/types.ts';
-import { DEFAULT_NAMES, PLAYER_COLORS, TOKENS } from '../ui/constants.ts';
+import { DEFAULT_NAMES, PLAYER_COLORS, TOKENS, normalizeToken } from '../ui/constants.ts';
 import { loadSetup, saveSetup } from '../ui/storage.ts';
 
 interface Props {
@@ -34,7 +34,20 @@ const DEFAULT: SetupState = {
 
 export default function Setup({ onBack, onStart }: Props) {
   // Nama, pion, dan mode diingat; mode dadu TIDAK diingat, selalu mulai dari acak otomatis.
-  const [st, setSt] = useState<SetupState>(() => ({ ...DEFAULT, ...(loadSetup<SetupState>() ?? {}), diceMode: 'digital' }));
+  const [st, setSt] = useState<SetupState>(() => {
+    const saved = loadSetup<SetupState>() ?? {};
+    const merged = { ...DEFAULT, ...saved, diceMode: 'digital' as const };
+    // Pion versi lama dipetakan ke karakter baru; pastikan tidak ada pion kembar.
+    const seen = new Set<string>();
+    merged.tokens = merged.tokens.map((t, i) => {
+      let id: string = normalizeToken(t);
+      if (seen.has(id)) id = TOKENS.find((x) => !seen.has(x.id))?.id ?? TOKENS[i % TOKENS.length].id;
+      seen.add(id);
+      return id;
+    });
+    while (merged.tokens.length < 6) merged.tokens.push(TOKENS.find((x) => !merged.tokens.includes(x.id))!.id);
+    return merged;
+  });
   const set = (patch: Partial<SetupState>) => setSt((s) => ({ ...s, ...patch }));
 
   const setName = (i: number, v: string) => set({ names: st.names.map((n, j) => (j === i ? v : n)) });

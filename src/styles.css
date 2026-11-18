@@ -1652,7 +1652,7 @@ h3 {
   overflow: hidden;
   border: 3px solid var(--jati);
   box-shadow: 0 4px 0 var(--jati), var(--shadow);
-  background: linear-gradient(180deg, #7ccbf5 0%, #b9e6ff 45%, #dff4ff 70%, #cfefff 100%);
+  background: radial-gradient(ellipse at 50% 30%, #f6e2bd 0%, #e2c08e 55%, #b98a58 100%);
   touch-action: none;
 }
 .board3d canvas {

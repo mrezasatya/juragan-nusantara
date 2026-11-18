@@ -9,10 +9,13 @@ import { HOUSE_NAMES, RegionalHouse, Resort } from './Houses.tsx';
 import Pawn from './Pawn.tsx';
 import { toon } from './materials.ts';
 
-function Spinner({ children, x, z = 0 }: { children: React.ReactNode; x: number; z?: number }) {
+function Spinner({ children, x, z = 0, sway = false }: { children: React.ReactNode; x: number; z?: number; sway?: boolean }) {
   const ref = useRef<THREE.Group>(null);
-  useFrame((_, dt) => {
-    if (ref.current) ref.current.rotation.y += dt * 0.45;
+  useFrame(({ clock }, dt) => {
+    if (!ref.current) return;
+    // Pion bergoyang menghadap depan (wajah terlihat); rumah berputar penuh.
+    if (sway) ref.current.rotation.y = Math.sin(clock.elapsedTime * 0.8 + x) * 0.5;
+    else ref.current.rotation.y += dt * 0.45;
   });
   return (
     <group position={[x, 0, z]}>
@@ -55,7 +58,7 @@ export default function Gallery3D({ onClose }: { onClose: () => void }) {
           {items.map((it, i) => {
             const [x, z] = pos(i);
             return (
-              <Spinner key={`${tab}-${it.key}`} x={x} z={z}>
+              <Spinner key={`${tab}-${it.key}`} x={x} z={z} sway={tab === 'pion'}>
                 {tab === 'rumah' && <RegionalHouse group={it.key as (typeof GROUPS)[number]['id']} />}
                 {tab === 'resort' && (
                   <group scale={0.95}>

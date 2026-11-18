@@ -6,8 +6,8 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { PALETTE, toon } from './materials.ts';
 import { HALF, TILE_RECTS, TILE_TOP } from './layout3d.ts';
-import { cardBackTexture, logoTexture } from './textures.ts';
-import { Palm } from './Houses.tsx';
+import { billTexture, cardBackTexture, logoTexture, woodTexture } from './textures.ts';
+import { Palm, RegionalHouse } from './Houses.tsx';
 
 export function Ocean() {
   const ref = useRef<THREE.Mesh>(null);
@@ -116,48 +116,273 @@ export function Sky() {
   );
 }
 
-/** Area tengah papan: laut kecil dengan pulau-pulau Nusantara, logo, dan tumpukan kartu. */
+/** Area tengah papan: laut kecil dengan pulau-pulau Nusantara dan landmark 3D, plus logo pita. */
 export function CenterSea() {
   const inner = HALF - 1.6 - 0.04;
   const logo = useMemo(() => logoTexture(), []);
-  const nasib = useMemo(() => cardBackTexture('nasib'), []);
-  const warga = useMemo(() => cardBackTexture('warga'), []);
   return (
     <group>
       <mesh position={[0, 0.07, 0]} material={toon('#3FB8D8')} receiveShadow>
         <boxGeometry args={[inner * 2, 0.04, inner * 2]} />
       </mesh>
-      {/* Pulau-pulau besar Nusantara (stilisasi, barat → timur) */}
-      <Island p={[-3.2, -1.6]} s={[1.1, 0.42]} rot={-0.6} trees={2} />
-      <Island p={[-1.6, -0.95]} s={[1.0, 0.25]} rot={-0.08} trees={1} />
-      <Island p={[-0.9, -2.4]} s={[0.85, 0.75]} trees={2} />
-      <Island p={[1.0, -1.6]} s={[0.45, 0.6]} rot={0.4} trees={1} />
-      <Island p={[0.9, -0.55]} s={[0.6, 0.18]} rot={0.05} trees={0} />
-      <Island p={[3.2, -1.2]} s={[1.0, 0.5]} rot={0.15} trees={2} />
-      <Island p={[2.2, -0.6]} s={[0.25, 0.15]} trees={0} />
-      <Pinisi radius={1.2} speed={0.3} center={[1.8, -3.3]} />
-      {/* Logo dibaringkan rata di atas laut supaya tidak menutupi dadu dari sudut kamera mana pun */}
-      <mesh position={[0, 0.1, 0.75]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[5.2, 2.03]} />
+      {/* Pulau stilisasi, barat → timur */}
+      <Island p={[-3.0, -2.0]} s={[1.3, 0.55]} rot={-0.6} trees={0} />
+      <Island p={[-1.0, -0.95]} s={[1.3, 0.34]} rot={-0.05} trees={0} />
+      <Island p={[-0.7, -2.95]} s={[0.95, 0.8]} trees={0} />
+      <Island p={[1.25, -2.2]} s={[0.55, 0.72]} rot={0.35} trees={0} />
+      <Island p={[1.15, -0.8]} s={[0.8, 0.22]} rot={0.04} trees={0} />
+      <Island p={[2.35, -1.35]} s={[0.3, 0.22]} trees={1} />
+      <Island p={[3.3, -1.9]} s={[1.05, 0.58]} rot={0.15} trees={0} />
+      <Landmarks />
+      <Pinisi radius={0.8} speed={0.35} center={[2.4, -3.6]} />
+      {/* Logo pita dibaringkan rata (tidak menutupi dadu dari sudut kamera mana pun) */}
+      <mesh position={[0, 0.1, 0.9]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[5.4, 2.2]} />
         <meshBasicMaterial map={logo} transparent toneMapped={false} depthWrite={false} />
       </mesh>
-      {/* Tumpukan kartu */}
-      <CardStack p={[-1.1, 3.0]} map={nasib} rot={0.2} />
-      <CardStack p={[1.1, 3.0]} map={warga} rot={-0.2} />
     </group>
   );
 }
 
-function CardStack({ p, map, rot }: { p: [number, number]; map: THREE.Texture; rot: number }) {
+// ---------- Landmark Nusantara ----------
+const ON = 0.17; // tinggi permukaan pulau
+
+function RoundTree({ p, s = 1 }: { p: [number, number]; s?: number }) {
   return (
-    <group position={[p[0], 0.09, p[1]]} rotation={[0, rot, 0]}>
-      <mesh position={[0, 0.06, 0]} material={toon('#F4E9D3')} castShadow>
-        <boxGeometry args={[0.7, 0.12, 1.0]} />
+    <group position={[p[0], ON, p[1]]} scale={s}>
+      <mesh position={[0, 0.1, 0]} material={toon('#7A4A2A')} castShadow>
+        <cylinderGeometry args={[0.025, 0.035, 0.2, 6]} />
       </mesh>
-      <mesh position={[0, 0.121, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[0.7, 1.0]} />
-        <meshToonMaterial map={map} />
+      <mesh position={[0, 0.27, 0]} material={toon('#3E9A4A')} castShadow>
+        <sphereGeometry args={[0.15, 10, 8]} />
       </mesh>
+      <mesh position={[0.08, 0.22, 0.05]} material={toon('#57B85A')} castShadow>
+        <sphereGeometry args={[0.1, 10, 8]} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Monas: pelataran, cawan, tugu, dan lidah api emas. */
+function Monas({ p }: { p: [number, number] }) {
+  const flame = useRef<THREE.Mesh>(null);
+  useFrame(({ clock }) => {
+    if (flame.current) flame.current.scale.y = 1 + Math.sin(clock.elapsedTime * 6) * 0.08;
+  });
+  return (
+    <group position={[p[0], ON, p[1]]}>
+      <mesh position={[0, 0.03, 0]} material={toon('#E9E4D8')} castShadow receiveShadow>
+        <boxGeometry args={[0.55, 0.06, 0.55]} />
+      </mesh>
+      <mesh position={[0, 0.16, 0]} material={toon('#F4F1EA')} castShadow>
+        <cylinderGeometry args={[0.24, 0.12, 0.2, 4]} />
+      </mesh>
+      <mesh position={[0, 0.8, 0]} rotation={[0, Math.PI / 4, 0]} material={toon('#FFFFFF')} castShadow>
+        <cylinderGeometry args={[0.045, 0.085, 1.1, 4]} />
+      </mesh>
+      <mesh position={[0, 1.37, 0]} material={toon('#D8D2C4')}>
+        <cylinderGeometry args={[0.07, 0.05, 0.05, 8]} />
+      </mesh>
+      <mesh ref={flame} position={[0, 1.5, 0]} material={toon('#F2C230', { emissive: '#8A5A00' })} castShadow>
+        <coneGeometry args={[0.065, 0.22, 8]} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Bendera Merah Putih berkibar. */
+function Flag({ p }: { p: [number, number] }) {
+  const cloth = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (cloth.current) cloth.current.rotation.y = Math.sin(clock.elapsedTime * 2.2) * 0.25;
+  });
+  return (
+    <group position={[p[0], ON, p[1]]}>
+      <mesh position={[0, 0.55, 0]} material={toon('#EEEEEE')} castShadow>
+        <cylinderGeometry args={[0.012, 0.016, 1.1, 6]} />
+      </mesh>
+      <group ref={cloth} position={[0, 1.0, 0]}>
+        <mesh position={[0.19, 0.04, 0]} material={toon('#D62C2C')} castShadow>
+          <boxGeometry args={[0.36, 0.08, 0.008]} />
+        </mesh>
+        <mesh position={[0.19, -0.04, 0]} material={toon('#FFFFFF')} castShadow>
+          <boxGeometry args={[0.36, 0.08, 0.008]} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/** Pura Meru (Bali): atap bertumpuk ganjil. */
+function Meru({ p }: { p: [number, number] }) {
+  return (
+    <group position={[p[0], ON, p[1]]}>
+      <mesh position={[0, 0.06, 0]} material={toon('#B8532E')} castShadow>
+        <boxGeometry args={[0.36, 0.12, 0.36]} />
+      </mesh>
+      <mesh position={[0, 0.45, 0]} material={toon('#6B4226')}>
+        <boxGeometry args={[0.08, 0.7, 0.08]} />
+      </mesh>
+      {[0, 1, 2, 3, 4].map((k) => {
+        const w = 0.42 - k * 0.07;
+        return (
+          <mesh key={k} position={[0, 0.2 + k * 0.13, 0]} rotation={[0, Math.PI / 4, 0]} material={toon('#3A2A20')} castShadow>
+            <coneGeometry args={[w * 0.75, 0.09, 4]} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+/** Komodo low-poly. */
+function Komodo({ p, rot = 0 }: { p: [number, number]; rot?: number }) {
+  const c = '#6E7B4A';
+  return (
+    <group position={[p[0], ON + 0.05, p[1]]} rotation={[0, rot, 0]} scale={1.1}>
+      <mesh rotation={[0, 0, Math.PI / 2]} material={toon(c)} castShadow>
+        <capsuleGeometry args={[0.045, 0.16, 4, 8]} />
+      </mesh>
+      <mesh position={[0.15, 0.01, 0]} rotation={[0, 0, Math.PI / 2]} material={toon(c)} castShadow>
+        <capsuleGeometry args={[0.03, 0.06, 4, 8]} />
+      </mesh>
+      <mesh position={[-0.2, -0.01, 0]} rotation={[0, 0, Math.PI / 2 + 0.15]} material={toon(c)} castShadow>
+        <coneGeometry args={[0.035, 0.22, 6]} />
+      </mesh>
+      {[-0.07, 0.07].flatMap((x) =>
+        [-1, 1].map((z) => (
+          <mesh key={`${x}${z}`} position={[x, -0.04, z * 0.05]} rotation={[z * 0.6, 0, 0]} material={toon(c)}>
+            <cylinderGeometry args={[0.014, 0.012, 0.06, 5]} />
+          </mesh>
+        )),
+      )}
+      <mesh position={[0.21, 0.0, 0]} rotation={[0, 0, Math.PI / 2]} material={toon('#D9433A')}>
+        <coneGeometry args={[0.008, 0.05, 4]} />
+      </mesh>
+    </group>
+  );
+}
+
+function Landmarks() {
+  return (
+    <group>
+      {/* Sumatra: Rumah Gadang */}
+      <group position={[-3.05, ON, -2.0]} rotation={[0, -0.5, 0]} scale={0.75}>
+        <RegionalHouse group="langit" />
+      </group>
+      <Palm p={[-3.8, ON, -1.55]} s={0.6} />
+      {/* Jawa: Monas + bendera */}
+      <Monas p={[-1.2, -0.95]} />
+      <Flag p={[-0.45, -0.98]} />
+      <RoundTree p={[-2.0, -0.92]} s={0.8} />
+      {/* Kalimantan: hutan */}
+      {[
+        [-1.0, -3.1],
+        [-0.55, -2.75],
+        [-0.3, -3.25],
+        [-1.15, -2.65],
+        [-0.75, -3.5],
+      ].map(([x, z], k) => (
+        <RoundTree key={k} p={[x, z]} s={0.75 + (k % 2) * 0.2} />
+      ))}
+      {/* Sulawesi: Tongkonan */}
+      <group position={[1.25, ON, -2.25]} rotation={[0, 0.3, 0]} scale={0.6}>
+        <RegionalHouse group="pandan" />
+      </group>
+      {/* Bali & Nusa Tenggara: Pura Meru + komodo */}
+      <Meru p={[0.65, -0.8]} />
+      <Komodo p={[1.6, -0.78]} rot={2.8} />
+      {/* Papua: Honai + hutan */}
+      <group position={[3.15, ON, -1.85]} scale={0.6}>
+        <RegionalHouse group="nila" />
+      </group>
+      <RoundTree p={[3.75, -2.1]} s={0.8} />
+      <Palm p={[3.6, ON, -1.5]} s={0.55} />
+    </group>
+  );
+}
+
+// ---------- Meja & properti di atas meja ----------
+const TABLE_Y = -0.55;
+
+export function Table() {
+  const tex = useMemo(() => woodTexture(), []);
+  return (
+    <mesh position={[0, TABLE_Y, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      <planeGeometry args={[70, 70]} />
+      <meshToonMaterial map={tex} gradientMap={toon('#fff').gradientMap} />
+    </mesh>
+  );
+}
+
+function DeckBox({ p, deck, rot }: { p: [number, number]; deck: 'nasib' | 'warga'; rot: number }) {
+  const map = useMemo(() => cardBackTexture(deck), [deck]);
+  const side = deck === 'nasib' ? '#B5442C' : '#1F5F8B';
+  return (
+    <group position={[p[0], TABLE_Y, p[1]]} rotation={[0, rot, 0]}>
+      <mesh position={[0, 0.22, 0]} material={toon(side)} castShadow receiveShadow>
+        <boxGeometry args={[1.25, 0.44, 1.75]} />
+      </mesh>
+      <mesh position={[0, 0.441, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1.2, 1.7]} />
+        <meshToonMaterial map={map} gradientMap={toon('#fff').gradientMap} />
+      </mesh>
+    </group>
+  );
+}
+
+const BILLS: [string, string][] = [
+  ['Rp 500 jt', '#E9A3B8'],
+  ['Rp 100 jt', '#F2D36B'],
+  ['Rp 50 jt', '#B9A3E3'],
+  ['Rp 20 jt', '#9BD48A'],
+  ['Rp 10 jt', '#8EC5E8'],
+];
+
+function MoneyStack({ p, label, color, n, rot }: { p: [number, number]; label: string; color: string; n: number; rot: number }) {
+  const map = useMemo(() => billTexture(label, color), [label, color]);
+  return (
+    <group position={[p[0], TABLE_Y, p[1]]} rotation={[0, rot, 0]}>
+      <mesh position={[0, (n * 0.012) / 2, 0]} material={toon(color)} castShadow receiveShadow>
+        <boxGeometry args={[1.5, n * 0.012, 0.75]} />
+      </mesh>
+      <mesh position={[0, n * 0.012 + 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1.5, 0.75]} />
+        <meshToonMaterial map={map} gradientMap={toon('#fff').gradientMap} />
+      </mesh>
+    </group>
+  );
+}
+
+function GameBox({ p, rot }: { p: [number, number]; rot: number }) {
+  const logo = useMemo(() => logoTexture(), []);
+  return (
+    <group position={[p[0], TABLE_Y, p[1]]} rotation={[0, rot, 0]}>
+      <mesh position={[0, 0.3, 0]} material={toon('#2E8BA8')} castShadow receiveShadow>
+        <boxGeometry args={[4.2, 0.6, 2.4]} />
+      </mesh>
+      <mesh position={[0, 0.602, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[4.0, 2.2]} />
+        <meshBasicMaterial color="#7FD0E6" />
+      </mesh>
+      <mesh position={[0, 0.605, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[3.8, 1.56]} />
+        <meshBasicMaterial map={logo} transparent toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Barang di atas meja di sekitar papan (dekorasi). */
+export function TableProps() {
+  return (
+    <group>
+      <DeckBox p={[8.3, -4.6]} deck="nasib" rot={0.12} />
+      <DeckBox p={[10.0, -4.4]} deck="warga" rot={-0.08} />
+      {BILLS.map(([label, color], k) => (
+        <MoneyStack key={label} p={[8.4 + (k % 2) * 0.35, 1.0 + k * 0.95]} label={label} color={color} n={8 + ((k * 5) % 7)} rot={-0.1 + k * 0.05} />
+      ))}
+      <GameBox p={[-10.0, -5.2]} rot={0.18} />
     </group>
   );
 }

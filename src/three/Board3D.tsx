@@ -18,7 +18,7 @@ import Pawn, { type Emote } from './Pawn.tsx';
 import { Burst, CONFETTI_COLORS, FloatingText, PopIn, Puff, moneyText } from './Effects.tsx';
 import type { FxEvent } from '../ui/gameEvents.ts';
 import Dice3D, { type DiceRoll } from './Dice3D.tsx';
-import { CenterSea, CornerProps, Ocean, Sky } from './Decor.tsx';
+import { CenterSea, CornerProps, Table, TableProps } from './Decor.tsx';
 
 export const STEP_MS_3D = 300;
 
@@ -142,7 +142,8 @@ function BoardBase() {
   const W = HALF * 2;
   return (
     <group>
-      <mesh position={[0, -0.25, 0]} material={toon('#8E3B22')} castShadow receiveShadow>
+      {/* Bingkai papan gelap seperti papan permainan sungguhan */}
+      <mesh position={[0, -0.25, 0]} material={toon('#2E2622')} castShadow receiveShadow>
         <boxGeometry args={[W + 0.7, 0.6, W + 0.7]} />
       </mesh>
       <mesh position={[0, 0.03, 0]} material={toon(PALETTE.kunyit)} receiveShadow>
@@ -151,14 +152,6 @@ function BoardBase() {
       <mesh position={[0, 0.06, 0]} material={toon('#6B4226')} receiveShadow>
         <boxGeometry args={[W + 0.1, 0.02, W + 0.1]} />
       </mesh>
-      {/* Kaki penyangga di laut */}
-      {[-1, 1].flatMap((sx) =>
-        [-1, 1].map((sz) => (
-          <mesh key={`${sx}${sz}`} position={[sx * (HALF - 0.4), -0.9, sz * (HALF - 0.4)]} material={toon('#5A3A22')}>
-            <cylinderGeometry args={[0.25, 0.3, 1.2, 8]} />
-          </mesh>
-        )),
-      )}
     </group>
   );
 }
@@ -176,7 +169,8 @@ function CameraRig({ follow, resetTick }: { follow: () => THREE.Object3D | null;
     const aspect = size.width / Math.max(1, size.height);
     const vfov = THREE.MathUtils.degToRad(camera.fov);
     const hfov = 2 * Math.atan(Math.tan(vfov / 2) * aspect);
-    const byW = 16.2 / 2 / Math.tan(hfov / 2);
+    // Layar portrait (HP) dibingkai lebih rapat supaya papan tampil lebih besar.
+    const byW = (aspect < 1 ? 14.6 : 16.2) / 2 / Math.tan(hfov / 2);
     const byH = 9.6 / 2 / Math.tan(vfov / 2) + 1.2;
     return Math.max(byW, byH);
   }, [size.width, size.height, camera.fov]);
@@ -247,7 +241,7 @@ function Scene({ game, onTileClick, onAnimating, diceRoll, onDiceDone, resetTick
 
   return (
     <>
-      <hemisphereLight args={['#DFF4FF', '#F2D49B', 1.35]} />
+      <hemisphereLight args={['#FFF3DF', '#8A5A35', 1.35]} />
       <ambientLight intensity={0.45} />
       {/* Cahaya tepi dari belakang: memberi garis terang pada siluet pion & rumah */}
       <directionalLight position={[-7, 6, -9]} intensity={1.1} color="#FFE2A8" />
@@ -258,15 +252,15 @@ function Scene({ game, onTileClick, onAnimating, diceRoll, onDiceDone, resetTick
         castShadow
         shadow-mapSize-width={1536}
         shadow-mapSize-height={1536}
-        shadow-camera-left={-9}
-        shadow-camera-right={9}
-        shadow-camera-top={9}
-        shadow-camera-bottom={-9}
+        shadow-camera-left={-12}
+        shadow-camera-right={12}
+        shadow-camera-top={12}
+        shadow-camera-bottom={-12}
         shadow-bias={-0.0006}
       />
-      <fog attach="fog" args={['#CFEFFF', 22, 48]} />
-      <Ocean />
-      <Sky />
+      <fog attach="fog" args={['#E8CFA6', 26, 62]} />
+      <Table />
+      <TableProps />
       <BoardBase />
       <CenterSea />
       <CornerProps />
