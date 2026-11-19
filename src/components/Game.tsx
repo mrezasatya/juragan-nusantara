@@ -4,6 +4,7 @@ import { canEndTurn, canRoll, currentPlayer } from '../engine/engine.ts';
 import { rp } from '../engine/format.ts';
 import type { GameState } from '../engine/types.ts';
 import Board from './Board.tsx';
+import Avatar from './Avatar.tsx';
 import CenterPanel from './CenterPanel.tsx';
 import PromptModal from './PromptModal.tsx';
 import PlayersPanel from './PlayersPanel.tsx';
@@ -92,6 +93,22 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
     window.addEventListener('pointerdown', unlock, { once: true });
     return () => window.removeEventListener('pointerdown', unlock);
   }, []);
+  // Pengumuman giliran di tengah layar (muncul setelah pion sebelumnya selesai berjalan)
+  const [turnPop, setTurnPop] = useState<{ key: number; player: string } | null>(() => ({ key: 0, player: game.players[game.current].id }));
+  const lastTurnFx = useRef(0);
+  useEffect(() => {
+    const t = [...fx].reverse().find((e) => e.kind === 'turn');
+    if (!t || t.id === lastTurnFx.current) return;
+    lastTurnFx.current = t.id;
+    setTurnPop({ key: t.id, player: t.player });
+  }, [fx]);
+  useEffect(() => {
+    if (!turnPop) return;
+    const t = setTimeout(() => setTurnPop(null), 1700);
+    return () => clearTimeout(t);
+  }, [turnPop]);
+  const popPlayer = turnPop ? game.players.find((p) => p.id === turnPop.player) : null;
+
   const toggleMute = () => {
     setMuted(!muted);
     setMutedState(!muted);
@@ -160,7 +177,8 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
           ☰
         </button>
         <div className="topbar-turn">
-          <span className="dot" style={{ background: me.color }} />
+          <Avatar token={me.token} size={30} ring={me.color} />
+          <span className="topbar-label">Giliran</span>
           <strong>{me.name}</strong>
           <span className="muted">· {rp(me.cash)}</span>
         </div>
@@ -314,6 +332,19 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
             </div>
           )}
         </Modal>
+      )}
+      {popPlayer && game.phase !== 'gameOver' && (
+        <div className="turn-pop" key={turnPop!.key} aria-hidden>
+          <div className="turn-pop-card" style={{ borderColor: popPlayer.color }}>
+            <Avatar token={popPlayer.token} size={72} ring={popPlayer.color} />
+            <div>
+              <div className="turn-pop-small">Sekarang giliran</div>
+              <div className="turn-pop-name" style={{ color: popPlayer.color }}>
+                {popPlayer.name}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
       {game.phase === 'gameOver' && !busy && <GameOver game={game} onHome={onHome} onNewGame={onNewGame} />}
       {/* Pastikan tombol akhiri giliran terjangkau keyboard */}

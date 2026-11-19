@@ -9,7 +9,7 @@ import * as THREE from 'three';
 import { tokenInfo, normalizeToken, type CharacterId } from '../ui/constants.ts';
 import { toon } from './materials.ts';
 import { TILE_TOP } from './layout3d.ts';
-import { batikTexture, kebayaTexture, kosSignTexture, sarungTexture } from './textures.ts';
+import { batikTexture, kebayaTexture, kosSignTexture, nameTagTexture, sarungTexture } from './textures.ts';
 
 export interface Emote {
   kind: 'celebrate' | 'sad';
@@ -17,6 +17,8 @@ export interface Emote {
 }
 
 interface Props {
+  /** Nama pemain; jika diisi, label nama tampil di atas kepala. */
+  name?: string;
   emote?: Emote | null;
   token: string;
   color: string;
@@ -546,12 +548,29 @@ function BaseProps({ char }: { char: CharacterId }) {
   );
 }
 
+/** Label nama sebagai sprite WebGL: ukuran tetap di layar, selalu di atas geometri. */
+function NameTag({ text, color, active }: { text: string; color: string; active: boolean }) {
+  const ref = useRef<THREE.Sprite>(null);
+  const { tex, aspect } = useMemo(() => nameTagTexture(text, color, active), [text, color, active]);
+  useEffect(() => () => tex.dispose(), [tex]);
+  const h = active ? 0.05 : 0.034;
+  const baseY = active ? 1.88 : 1.2;
+  useFrame(({ clock }) => {
+    if (ref.current) ref.current.position.y = baseY + (active ? Math.abs(Math.sin(clock.elapsedTime * 3.2)) * 0.12 : 0);
+  });
+  return (
+    <sprite ref={ref} position={[0, baseY, 0]} scale={[h * aspect, h, 1]} renderOrder={active ? 20 : 10}>
+      <spriteMaterial map={tex} transparent depthTest={false} depthWrite={false} sizeAttenuation={false} toneMapped={false} />
+    </sprite>
+  );
+}
+
 // ---------- Komponen utama ----------
 const DOWN = new THREE.Vector3(0, -1, 0);
 const tmpQ = new THREE.Quaternion();
 const tmpV = new THREE.Vector3();
 
-export default function Pawn({ token, color, target, stepMs, active, jailed, registry, id, emote }: Props) {
+export default function Pawn({ token, color, target, stepMs, active, jailed, registry, id, emote, name }: Props) {
   const char = normalizeToken(token);
   const info = tokenInfo(char);
   const look = LOOKS[char];
@@ -680,9 +699,10 @@ export default function Pawn({ token, color, target, stepMs, active, jailed, reg
       ringMat.opacity = 0.6 + Math.sin(time * 4) * 0.3;
     }
     if (arrow.current) {
-      arrow.current.visible = active && !moving;
-      arrow.current.position.y = 1.15 + Math.sin(time * 3) * 0.06;
-      arrow.current.rotation.y = time * 2;
+      // Panah giliran selalu tampil untuk pion aktif (termasuk saat berjalan)
+      arrow.current.visible = active;
+      arrow.current.position.y = 1.32 + Math.abs(Math.sin(time * 3.2)) * 0.12;
+      arrow.current.rotation.y = time * 1.6;
     }
   });
 
@@ -698,11 +718,22 @@ export default function Pawn({ token, color, target, stepMs, active, jailed, reg
       <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, BASE_H + 0.003, 0]} material={ringMat}>
         <ringGeometry args={[0.15, 0.195, 32]} />
       </mesh>
+      {/* Panah giliran besar berwarna pemain, berbingkai gelap */}
       <group ref={arrow}>
-        <mesh rotation={[Math.PI, 0, 0]} material={toon('#FFD54A', { emissive: '#7A5A00' })}>
-          <coneGeometry args={[0.08, 0.15, 4]} />
+        <mesh rotation={[Math.PI, 0, 0]} material={toon(color, { emissive: color })}>
+          <coneGeometry args={[0.16, 0.3, 4]} />
+          <mesh material={HULL_MAT} scale={[1.12, 1.08, 1.12]}>
+            <coneGeometry args={[0.16, 0.3, 4]} />
+          </mesh>
+        </mesh>
+        <mesh position={[0, 0.2, 0]} material={toon(color, { emissive: color })}>
+          <boxGeometry args={[0.1, 0.18, 0.1]} />
+          <mesh material={HULL_MAT} scale={[1.2, 1.1, 1.2]}>
+            <boxGeometry args={[0.1, 0.18, 0.1]} />
+          </mesh>
         </mesh>
       </group>
+      {name && <NameTag text={active ? `GILIRAN · ${name}` : name} color={color} active={active} />}
       <group ref={body} position={[0, BASE_H, 0]} scale={S}>
         <BaseProps char={char} />
         <Lower look={look} skinColor={info.skin} legL={legL} legR={legR} />

@@ -456,3 +456,44 @@ export function kosSignTexture() {
     ctx.fillText('KOS', 64, 39);
   });
 }
+
+/** Label nama di atas pion (pil berwarna pemain, teks putih). Mengembalikan tekstur & rasio lebar/tinggi. */
+export function nameTagTexture(text: string, color: string, big: boolean): { tex: THREE.CanvasTexture; aspect: number } {
+  const H = big ? 96 : 64;
+  const font = big ? `${Math.round(H * 0.5)}px "Lilita One", "Trebuchet MS", sans-serif` : `800 ${Math.round(H * 0.46)}px Nunito, sans-serif`;
+  const probe = document.createElement('canvas').getContext('2d')!;
+  probe.font = font;
+  const pad = H * 0.45;
+  const W = Math.ceil(probe.measureText(text).width + pad * 2);
+  const c = document.createElement('canvas');
+  c.width = W;
+  c.height = H;
+  const ctx = c.getContext('2d')!;
+  const r = H / 2 - 4;
+  const bw = big ? 7 : 5;
+  ctx.beginPath();
+  ctx.moveTo(r + 4, 4);
+  ctx.lineTo(W - r - 4, 4);
+  ctx.arc(W - r - 4, H / 2, r, -Math.PI / 2, Math.PI / 2);
+  ctx.lineTo(r + 4, H - 4);
+  ctx.arc(r + 4, H / 2, r, Math.PI / 2, -Math.PI / 2);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = bw;
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.stroke();
+  ctx.font = font;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = big ? 6 : 4;
+  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+  ctx.strokeText(text, W / 2, H / 2 + 2);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(text, W / 2, H / 2 + 2);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return { tex, aspect: W / H };
+}

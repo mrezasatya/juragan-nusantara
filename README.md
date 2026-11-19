@@ -21,6 +21,7 @@ Proyek hiburan non-komersial. Spesifikasi lengkap ada di [`docs/konsep-game-jura
 - **Efek & suara**: teks uang melayang (+Rp/−Rp), hujan koin, konfeti saat membeli properti dan saat menang, rumah yang muncul memantul, pion bersorak/lesu/melambai, garis tepi kartun, serta efek suara yang disintesis di browser (tanpa file audio) dengan tombol 🔊/🔇.
 - **8 pion karakter** bergaya figurin chibi di atas alas bundar berwarna pemain: Mas Ojol, Pak Kos, Bu Warung, Mas Kantoran, Pak PNS, Adik SD, Bang Punk, dan Mas Mie Ayam, masing-masing dengan kostum, pose, dan properti khas.
 - Papan di atas **meja kayu**, dengan landmark 3D di tengah (Monas, bendera Merah Putih, Pura Meru, Rumah Gadang, Tongkonan, Honai, komodo), logo pita, kotak kartu, uang mainan, dan kotak game.
+- **Penanda giliran**: panah & label nama di atas pion aktif, label nama di atas semua pion, spanduk giliran, dan pengumuman saat giliran berganti. Potret karakter dipakai di pemilihan pion, panel pemain, dan layar pemenang. Nama pemain ditulis sendiri (kosong = nama karakter).
 - **Galeri 3D** di beranda untuk melihat 8 rumah adat, versi Resort, dan 8 karakter pion.
 
 ## Menjalankan

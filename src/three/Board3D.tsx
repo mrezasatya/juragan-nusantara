@@ -17,6 +17,7 @@ import { OwnerFlag, RegionalHouse, Resort } from './Houses.tsx';
 import Pawn, { type Emote } from './Pawn.tsx';
 import { Burst, CONFETTI_COLORS, FloatingText, PopIn, Puff, moneyText } from './Effects.tsx';
 import type { FxEvent } from '../ui/gameEvents.ts';
+import Avatar from '../components/Avatar.tsx';
 import Dice3D, { type DiceRoll } from './Dice3D.tsx';
 import { CenterSea, CornerProps, Table, TableProps } from './Decor.tsx';
 
@@ -158,7 +159,7 @@ function BoardBase() {
 
 // ---------- Kamera ----------
 
-function CameraRig({ follow, resetTick }: { follow: () => THREE.Object3D | null; resetTick: number }) {
+function CameraRig({ follow, focus, resetTick }: { follow: () => THREE.Object3D | null; focus: () => THREE.Object3D | null; resetTick: number }) {
   const { camera, size, controls } = useThree() as unknown as { camera: THREE.PerspectiveCamera; size: { width: number; height: number }; controls: OrbitControlsImpl | null };
   const userUntil = useRef(0);
   const intro = useRef(0); // detik sejak adegan mulai, untuk sapuan kamera pembuka
@@ -191,9 +192,17 @@ function CameraRig({ follow, resetTick }: { follow: () => THREE.Object3D | null;
     const f = follow();
     const wantTarget = new THREE.Vector3(0, 0, 1.2);
     let dist = overviewDist;
+    const aspect = size.width / Math.max(1, size.height);
     if (f) {
       wantTarget.lerp(new THREE.Vector3(f.position.x, 0, f.position.z), 0.75);
       dist = Math.min(dist * 0.55, 9);
+    } else {
+      // Saat menunggu: kamera sedikit condong ke pion yang sedang giliran agar tidak di tepi layar
+      const a = focus();
+      if (a) {
+        wantTarget.lerp(new THREE.Vector3(a.position.x, 0, a.position.z), aspect < 1 ? 0.42 : 0.3);
+        dist *= aspect < 1 ? 0.9 : 0.95;
+      }
     }
     const k = 1 - Math.exp(-dt * 2.4);
     target.current.lerp(wantTarget, k);
@@ -294,6 +303,7 @@ function Scene({ game, onTileClick, onAnimating, diceRoll, onDiceDone, resetTick
               jailed={p.inJail}
               registry={registry}
               emote={emotes[p.id] ?? null}
+              name={p.name}
             />
           );
         })}
@@ -308,7 +318,11 @@ function Scene({ game, onTileClick, onAnimating, diceRoll, onDiceDone, resetTick
         maxPolarAngle={1.25}
         enableDamping
       />
-      <CameraRig follow={() => (mover ? (registry.get(mover) ?? null) : null)} resetTick={resetTick} />
+      <CameraRig
+        follow={() => (mover ? (registry.get(mover) ?? null) : null)}
+        focus={() => (game.phase !== 'gameOver' ? (registry.get(current.id) ?? null) : null)}
+        resetTick={resetTick}
+      />
     </>
   );
 }
@@ -435,6 +449,14 @@ export default function Board3D(props: Props) {
           🪙 Kas Arisan <strong>{rp(game.arisan)}</strong>
         </div>
       </div>
+      {game.phase !== 'gameOver' && (
+        <div className="hud-turn" style={{ background: game.players[game.current].color }} aria-live="polite">
+          <Avatar token={game.players[game.current].token} size={30} ring="#fff" />
+          <span>
+            Giliran <strong>{game.players[game.current].name}</strong>
+          </span>
+        </div>
+      )}
       <div className="hud-tr">
         <button className="hud-btn" onClick={() => setResetTick((t) => t + 1)} title="Kembalikan kamera" aria-label="Kembalikan kamera">
           🎥
