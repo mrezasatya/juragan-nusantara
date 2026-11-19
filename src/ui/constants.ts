@@ -1,27 +1,38 @@
-export type HatKind = 'caping' | 'pet' | 'handuk' | 'pelaut' | 'blangkon' | 'bandana' | 'helm' | 'sanggul';
+export type CharacterId = 'ojol' | 'kos' | 'warung' | 'kantoran' | 'pns' | 'sd' | 'punk' | 'mie';
 
 export interface TokenOption {
-  id: string;
+  id: CharacterId;
   label: string;
   emoji: string; // dipakai di tampilan 2D & panel
-  hat: HatKind;
   skin: string;
-  pants: string;
 }
 
-// Pion manusia 3D (id tetap sama dengan versi sebelumnya agar simpanan lama tetap terbaca).
+// 8 pion karakter (figurin chibi di atas alas bundar berwarna pemain).
 export const TOKENS: TokenOption[] = [
-  { id: 'becak', label: 'Abang Becak', emoji: '👒', hat: 'caping', skin: '#C68A5B', pants: '#3B4A6B' },
-  { id: 'bajaj', label: 'Bang Bajaj', emoji: '🧢', hat: 'pet', skin: '#B97A4E', pants: '#2F3A2F' },
-  { id: 'angkot', label: 'Sopir Angkot', emoji: '🚐', hat: 'handuk', skin: '#A86B43', pants: '#4A3B2A' },
-  { id: 'pinisi', label: 'Pelaut Pinisi', emoji: '⛵', hat: 'pelaut', skin: '#8E5A36', pants: '#F2F2F2' },
-  { id: 'delman', label: 'Kusir Delman', emoji: '🐎', hat: 'blangkon', skin: '#C99368', pants: '#2B2B2B' },
-  { id: 'bakso', label: 'Mas Bakso', emoji: '🍜', hat: 'bandana', skin: '#D8A57B', pants: '#5A4632' },
-  { id: 'ojek', label: 'Mas Ojek', emoji: '🛵', hat: 'helm', skin: '#B47F57', pants: '#1F2A44' },
-  { id: 'ondel', label: 'Mbak Penari', emoji: '💃', hat: 'sanggul', skin: '#E0B08A', pants: '#7B2D5B' },
+  { id: 'ojol', label: 'Mas Ojol', emoji: '🛵', skin: '#E2AE84' },
+  { id: 'kos', label: 'Pak Kos', emoji: '🏠', skin: '#D59A6E' },
+  { id: 'warung', label: 'Bu Warung', emoji: '🍲', skin: '#E8B98F' },
+  { id: 'kantoran', label: 'Mas Kantoran', emoji: '💼', skin: '#EDC29C' },
+  { id: 'pns', label: 'Pak PNS', emoji: '📋', skin: '#D9A275' },
+  { id: 'sd', label: 'Adik SD', emoji: '🎒', skin: '#E9B88C' },
+  { id: 'punk', label: 'Bang Punk', emoji: '🤘', skin: '#DDA679' },
+  { id: 'mie', label: 'Mas Mie Ayam', emoji: '🍜', skin: '#D49A6C' },
 ];
-export const tokenInfo = (id: string) => TOKENS.find((t) => t.id === id) ?? TOKENS[0];
-export const tokenEmoji = (id: string) => TOKENS.find((t) => t.id === id)?.emoji ?? '●';
+
+// ID pion versi lama → karakter baru, agar permainan yang tersimpan tetap bisa dilanjutkan.
+const LEGACY: Record<string, CharacterId> = {
+  ojek: 'ojol',
+  becak: 'kos',
+  bakso: 'warung',
+  angkot: 'kantoran',
+  delman: 'pns',
+  ondel: 'sd',
+  bajaj: 'punk',
+  pinisi: 'mie',
+};
+export const normalizeToken = (id: string): CharacterId => (TOKENS.some((t) => t.id === id) ? (id as CharacterId) : (LEGACY[id] ?? 'ojol'));
+export const tokenInfo = (id: string) => TOKENS.find((t) => t.id === normalizeToken(id))!;
+export const tokenEmoji = (id: string) => tokenInfo(id).emoji;
 
 export const PLAYER_COLORS = ['#C0392B', '#1F5F8B', '#3E8B3A', '#D99A0B', '#7B4FA0', '#D2557F'];
 

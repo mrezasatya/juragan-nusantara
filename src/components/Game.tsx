@@ -4,6 +4,7 @@ import { canEndTurn, canRoll, currentPlayer } from '../engine/engine.ts';
 import { rp } from '../engine/format.ts';
 import type { GameState } from '../engine/types.ts';
 import Board from './Board.tsx';
+import Avatar from './Avatar.tsx';
 import CenterPanel from './CenterPanel.tsx';
 import PromptModal from './PromptModal.tsx';
 import PlayersPanel from './PlayersPanel.tsx';
@@ -19,6 +20,8 @@ import { ITEM_LABEL } from '../ui/constants.ts';
 import { CONFIG } from '../engine/data.ts';
 import { cryptoDie, loadView, saveView, supportsWebGL, type ViewMode } from '../ui/storage.ts';
 import type { DiceRoll } from '../three/Dice3D.tsx';
+import { diffEvents, stamp, type FxEvent } from '../ui/gameEvents.ts';
+import { isMuted, setMuted, sfx, unlockAudio } from '../ui/sfx.ts';
 
 const Board3D = lazy(() => import('../three/Board3D.tsx'));
 
@@ -50,9 +53,71 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
   const physical = game.diceMode === 'fisik';
   const is3d = view === '3d';
 
+  // ===== Efek (suara & visual) yang ditahan sampai pion selesai berjalan =====
+  const [fx, setFx] = useState<FxEvent[]>([]);
+  const [muted, setMutedState] = useState(isMuted());
+  const [animDoneSeq, setAnimDoneSeq] = useState(game.moveSeq);
+  const latestMoveSeq = useRef(game.moveSeq);
+  latestMoveSeq.current = game.moveSeq;
+  const prevGame = useRef(game);
+  const pendingFx = useRef<ReturnType<typeof diffEvents>>([]);
+  const onAnimating = useCallback((b: boolean) => {
+    setAnimating(b);
+    if (!b) setAnimDoneSeq(latestMoveSeq.current);
+  }, []);
+  useEffect(() => {
+    if (prevGame.current === game) return;
+    pendingFx.current.push(...diffEvents(prevGame.current, game));
+    prevGame.current = game;
+  }, [game]);
+  const settled = !animating && !rolling && game.moveSeq === animDoneSeq;
+  useEffect(() => {
+    if (!settled || !pendingFx.current.length) return;
+    const evs = stamp(pendingFx.current.splice(0));
+    setFx((f) => [...f, ...evs].slice(-40));
+    playSounds(evs);
+  }, [settled, game]);
+  // Pengaman: jika animasi tidak melapor (mis. papan 3D masih dimuat), jangan tahan efek selamanya.
+  useEffect(() => {
+    if (animating || game.moveSeq === animDoneSeq) return;
+    const t = setTimeout(() => setAnimDoneSeq(latestMoveSeq.current), 4000);
+    return () => clearTimeout(t);
+  }, [animating, game.moveSeq, animDoneSeq]);
+  useEffect(() => {
+    if (!fx.length) return;
+    const t = setTimeout(() => setFx((f) => f.filter((e) => performance.now() - e.at < 3000)), 3100);
+    return () => clearTimeout(t);
+  }, [fx]);
+  useEffect(() => {
+    const unlock = () => unlockAudio();
+    window.addEventListener('pointerdown', unlock, { once: true });
+    return () => window.removeEventListener('pointerdown', unlock);
+  }, []);
+  // Pengumuman giliran di tengah layar (muncul setelah pion sebelumnya selesai berjalan)
+  const [turnPop, setTurnPop] = useState<{ key: number; player: string } | null>(() => ({ key: 0, player: game.players[game.current].id }));
+  const lastTurnFx = useRef(0);
+  useEffect(() => {
+    const t = [...fx].reverse().find((e) => e.kind === 'turn');
+    if (!t || t.id === lastTurnFx.current) return;
+    lastTurnFx.current = t.id;
+    setTurnPop({ key: t.id, player: t.player });
+  }, [fx]);
+  useEffect(() => {
+    if (!turnPop) return;
+    const t = setTimeout(() => setTurnPop(null), 1700);
+    return () => clearTimeout(t);
+  }, [turnPop]);
+  const popPlayer = turnPop ? game.players.find((p) => p.id === turnPop.player) : null;
+
+  const toggleMute = () => {
+    setMuted(!muted);
+    setMutedState(!muted);
+  };
+
   const switchView = (v: ViewMode) => {
     setView(v);
     saveView(v);
+    setAnimDoneSeq(game.moveSeq);
   };
 
   /** Selesaikan lemparan: kirim angka dadu ke engine (dipanggil setelah animasi dadu mendarat). */
@@ -69,6 +134,8 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
   );
 
   const throwDice = (values: [number, number]) => {
+    unlockAudio();
+    sfx.dice();
     if (!is3d) {
       setRolling(true);
       setTimeout(() => {
@@ -99,7 +166,8 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
   }, [game.prompt, panel]);
 
   const timeLeft = game.kilat?.endsAt ? Math.max(0, game.kilat.endsAt - now) : null;
-  const canManage = !busy && (!game.prompt || game.prompt.type === 'debt' || game.prompt.type === 'buy') && game.phase !== 'resolving';
+  const canManage =
+    !busy && game.phase !== 'gameOver' && (!game.prompt || game.prompt.type === 'debt' || game.prompt.type === 'buy') && game.phase !== 'resolving';
   const outsideTurnFlow = !game.prompt && (game.phase === 'preRoll' || game.phase === 'postRoll');
 
   return (
@@ -109,7 +177,8 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
           ☰
         </button>
         <div className="topbar-turn">
-          <span className="dot" style={{ background: me.color }} />
+          <Avatar token={me.token} size={30} ring={me.color} />
+          <span className="topbar-label">Giliran</span>
           <strong>{me.name}</strong>
           <span className="muted">· {rp(me.cash)}</span>
         </div>
@@ -119,6 +188,9 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
           {game.kilat?.maxRounds ? `/${game.kilat.maxRounds}` : ''}
           {timeLeft !== null && <span className={timeLeft === 0 ? 'time-up' : ''}> · ⏱ {fmtTime(timeLeft)}</span>}
         </div>
+        <button className="btn btn-ghost btn-sm" onClick={toggleMute} aria-label={muted ? 'Nyalakan suara' : 'Matikan suara'} title={muted ? 'Nyalakan suara' : 'Matikan suara'}>
+          {muted ? '🔇' : '🔊'}
+        </button>
         <button className="btn btn-ghost btn-sm" onClick={onRules} aria-label="Cara main">
           ?
         </button>
@@ -131,7 +203,8 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
               <Board3D
                 game={game}
                 onTileClick={setTileInfo}
-                onAnimating={setAnimating}
+                onAnimating={onAnimating}
+                fx={fx}
                 diceRoll={diceRoll}
                 rolling={rolling}
                 onDiceDone={(r) => finishRoll(r.id)}
@@ -139,7 +212,7 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
               />
             </Suspense>
           ) : (
-            <Board game={game} onTileClick={setTileInfo} onAnimating={setAnimating} highlight={me.position}>
+            <Board game={game} onTileClick={setTileInfo} onAnimating={onAnimating} highlight={me.position}>
               <CenterPanel game={game} rolling={rolling} />
             </Board>
           )}
@@ -193,12 +266,18 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
       {panel === 'trade' && <TradeModal game={game} dispatch={dispatch} onClose={() => setPanel(null)} />}
       {panel === 'loan' && <LoanModal game={game} dispatch={dispatch} onClose={() => setPanel(null)} />}
       {pickDice && (
-        <Modal title="Masukkan angka dadu fisik" onClose={() => setPickDice(false)}>
+        <Modal title="Masukkan angka dadu sungguhan" onClose={() => setPickDice(false)}>
           <DicePicker
             count={2}
+            label="Lempar dadu di meja, lalu pilih angka yang keluar. Tidak punya dadu? Tekan Acak otomatis."
             onDone={(d) => {
               setPickDice(false);
               throwDice([d[0], d[1]]);
+            }}
+            onSwitchAuto={() => {
+              dispatch({ type: 'SET_DICE_MODE', mode: 'digital' });
+              setPickDice(false);
+              throwDice([cryptoDie(), cryptoDie()]);
             }}
           />
         </Modal>
@@ -218,6 +297,15 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
                 🎮 Ganti ke tampilan 3D{supportsWebGL() ? '' : ' (tidak didukung perangkat ini)'}
               </button>
             )}
+            <button
+              className="btn"
+              onClick={() => {
+                dispatch({ type: 'SET_DICE_MODE', mode: physical ? 'digital' : 'fisik' });
+                setPanel(null);
+              }}
+            >
+              {physical ? '🎲 Ganti ke dadu acak otomatis' : '✋ Ganti ke dadu sungguhan di meja'}
+            </button>
             <button className="btn" onClick={onHome}>
               🏠 Ke Beranda (permainan tersimpan)
             </button>
@@ -244,6 +332,19 @@ export default function Game({ game, dispatch, onRules, onHome, onNewGame }: Pro
             </div>
           )}
         </Modal>
+      )}
+      {popPlayer && game.phase !== 'gameOver' && (
+        <div className="turn-pop" key={turnPop!.key} aria-hidden>
+          <div className="turn-pop-card" style={{ borderColor: popPlayer.color }}>
+            <Avatar token={popPlayer.token} size={72} ring={popPlayer.color} />
+            <div>
+              <div className="turn-pop-small">Sekarang giliran</div>
+              <div className="turn-pop-name" style={{ color: popPlayer.color }}>
+                {popPlayer.name}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
       {game.phase === 'gameOver' && !busy && <GameOver game={game} onHome={onHome} onNewGame={onNewGame} />}
       {/* Pastikan tombol akhiri giliran terjangkau keyboard */}
@@ -319,6 +420,30 @@ function TurnActions({
     );
   }
   return null;
+}
+
+/** Satu suara per jenis kejadian per kelompok, diberi jeda supaya tidak menumpuk. */
+function playSounds(evs: FxEvent[]) {
+  const kinds = new Set<string>(evs.map((e) => (e.kind === 'money' ? (e.amount > 0 ? 'gain' : 'loss') : e.kind)));
+  const order: [string, () => void][] = [
+    ['win', sfx.win],
+    ['bankrupt', sfx.bankrupt],
+    ['jail', sfx.jail],
+    ['buy', sfx.buy],
+    ['build', sfx.build],
+    ['card', sfx.card],
+    ['gain', sfx.coin],
+    ['loss', sfx.pay],
+    ['turn', sfx.turn],
+  ];
+  let delay = 0;
+  for (const [k, play] of order) {
+    if (!kinds.has(k)) continue;
+    if (k === 'loss' && (kinds.has('buy') || kinds.has('build'))) continue;
+    if (k === 'turn' && kinds.size > 1) continue;
+    setTimeout(play, delay);
+    delay += 220;
+  }
 }
 
 function useNow(interval: number | null) {

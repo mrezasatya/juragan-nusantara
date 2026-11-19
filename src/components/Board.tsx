@@ -4,7 +4,7 @@ import { GROUP_BY_ID, TILES, isOwnable } from '../engine/data.ts';
 import { rp } from '../engine/format.ts';
 import type { GameState, Tile } from '../engine/types.ts';
 import { GRID_TEMPLATE, gridPos, tileCenter } from '../ui/geometry.ts';
-import { tokenEmoji } from '../ui/constants.ts';
+import Avatar from './Avatar.tsx';
 import { Buildings } from './Art.tsx';
 
 interface Props {
@@ -62,7 +62,8 @@ export default function Board({ game, onTileClick, onAnimating, highlight, child
                   zIndex: p.id === current.id ? 5 : 2,
                 }}
               >
-                <span>{tokenEmoji(p.token)}</span>
+                <Avatar token={p.token} size={64} ring={p.color} />
+                {p.id === current.id && game.phase !== 'gameOver' && <span className="token-arrow">▼</span>}
               </div>
             );
           })}

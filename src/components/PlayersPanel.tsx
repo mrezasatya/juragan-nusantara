@@ -2,7 +2,8 @@ import { CARD_BY_ID, GROUP_BY_ID, TILES } from '../engine/data.ts';
 import { getPlayer, loanDue, netWorth, ownedTiles } from '../engine/engine.ts';
 import { rp } from '../engine/format.ts';
 import type { GameState } from '../engine/types.ts';
-import { ITEM_HELP, ITEM_LABEL, tokenEmoji } from '../ui/constants.ts';
+import { ITEM_HELP, ITEM_LABEL, tokenInfo } from '../ui/constants.ts';
+import Avatar from './Avatar.tsx';
 
 export default function PlayersPanel({ game, onTile }: { game: GameState; onTile: (i: number) => void }) {
   return (
@@ -13,10 +14,12 @@ export default function PlayersPanel({ game, onTile }: { game: GameState; onTile
         return (
           <div key={p.id} className={`player ${idx === game.current ? 'player-on' : ''} ${p.bankrupt ? 'player-out' : ''}`} style={{ borderColor: p.color }}>
             <div className="player-head">
-              <span className="player-token" style={{ background: p.color }}>
-                {tokenEmoji(p.token)}
+              <Avatar token={p.token} size={38} ring={p.color} />
+              <span className="player-name">
+                <strong>{p.name}</strong>
+                <small>{tokenInfo(p.token).label}</small>
               </span>
-              <strong className="player-name">{p.name}</strong>
+              {idx === game.current && !p.bankrupt && game.phase !== 'gameOver' && <span className="turn-badge">▶ GILIRAN</span>}
               <span className="player-cash">{p.bankrupt ? 'Bangkrut' : rp(p.cash)}</span>
             </div>
             {!p.bankrupt && (

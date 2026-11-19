@@ -11,6 +11,8 @@ Juragan Nusantara adalah board game properti bertema Indonesia untuk **2–6 pem
 - Papan tampil dalam **3D** secara bawaan. **Seret** untuk memutar kamera, **cubit atau scroll** untuk zoom, dan **ketuk petak** untuk melihat detailnya. Tombol 🎥 mengembalikan kamera.
 - Pion berjalan petak demi petak sesuai angka dadu. Kamera otomatis mendekat ke pion yang sedang berjalan.
 - Rumah yang dibangun mengikuti **rumah adat** daerah propertinya. Resort tampil sebagai rumah adat besar dengan kolam dan bendera pemilik.
+- **Siapa yang sedang giliran?** Lihat panah dan label **"GILIRAN · Nama"** di atas kepala pion, spanduk di atas papan, dan lencana ▶ GILIRAN di panel pemain. Setiap kali giliran berganti, nama pemain berikutnya muncul besar di tengah layar.
+- Efek suara bisa dimatikan atau dinyalakan lewat tombol 🔊 di bagian atas layar.
 - Di perangkat yang berat atau tidak mendukung 3D, tekan tombol **2D** (atau lewat Menu) untuk tampilan ringan. Aturan main tetap sama.
 
 ## Tujuan
@@ -34,8 +36,8 @@ Juragan Nusantara adalah board game properti bertema Indonesia untuk **2–6 pem
 
 ## Dadu
 
-- **Dadu digital:** tekan tombol **Lempar Dadu**. Angka diacak oleh pengacak kriptografis bawaan browser, sehingga peluang setiap angka sama.
-- **Dadu fisik:** lempar dadu sungguhan di meja, lalu masukkan angkanya di aplikasi. Pilih mode ini saat membuat permainan.
+- **Dadu acak otomatis (bawaan):** tekan tombol **Lempar Dadu**. Angka diacak oleh pengacak kriptografis bawaan browser, sehingga peluang setiap angka sama.
+- **Dadu sungguhan di meja (opsional):** lempar dadu asli di meja, lalu pilih angkanya di aplikasi. Pilih mode ini saat membuat permainan. Di layar input angka selalu ada tombol **Acak otomatis saja**, dan mode bisa diganti kapan saja lewat **Menu**.
 - **Dobel** (kedua dadu sama): lempar lagi setelah aksi selesai.
 - **Dobel 3 kali berturut-turut:** langsung masuk Hotel Prodeo. *"Ngebut terus, dicurigai."*
 

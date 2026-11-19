@@ -151,32 +151,146 @@ export function dieFaceTexture(v: number): THREE.CanvasTexture {
   return tex;
 }
 
-/** Papan nama/logo di tengah papan. */
+/** Logo pita merah-emas: "JURAGAN NUSANTARA" + pita tagline. */
 export function logoTexture(): THREE.CanvasTexture {
   const W = 1024;
-  const H = 400;
+  const H = 420;
   const c = document.createElement('canvas');
   c.width = W;
   c.height = H;
   const ctx = c.getContext('2d')!;
+  const banner = (x: number, y: number, w: number, h: number, r: number) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  };
+  // Pita bawah (tagline) dengan ujung berlekuk
+  ctx.fillStyle = '#8A5A2A';
+  for (const side of [-1, 1]) {
+    const x0 = side < 0 ? 140 : W - 140;
+    ctx.beginPath();
+    ctx.moveTo(x0, 300);
+    ctx.lineTo(x0 + side * 110, 300);
+    ctx.lineTo(x0 + side * 80, 340);
+    ctx.lineTo(x0 + side * 110, 380);
+    ctx.lineTo(x0, 380);
+    ctx.closePath();
+    ctx.fill();
+  }
+  banner(150, 292, W - 300, 92, 18);
+  ctx.fillStyle = '#F6E3B4';
+  ctx.fill();
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = '#B8862B';
+  ctx.stroke();
+  ctx.fillStyle = '#5A3A22';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = '160px "Lilita One", "Trebuchet MS", sans-serif';
+  // Ukuran huruf menyesuaikan lebar pita supaya tidak terpotong
+  const tagline = 'Borong Nusantara · Asal Kuat Bayar Iuran';
+  let fs = 44;
+  do {
+    ctx.font = `800 ${fs}px Nunito, "Trebuchet MS", sans-serif`;
+    fs -= 2;
+  } while (ctx.measureText(tagline).width > W - 360 && fs > 20);
+  ctx.fillText(tagline, W / 2, 340);
+  // Pita utama merah
+  banner(40, 30, W - 80, 260, 60);
+  const g = ctx.createLinearGradient(0, 30, 0, 290);
+  g.addColorStop(0, '#E0503A');
+  g.addColorStop(1, '#A92A1B');
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.lineWidth = 16;
+  ctx.strokeStyle = '#E8B23A';
+  ctx.stroke();
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = '#FFF0B8';
+  banner(58, 48, W - 116, 224, 46);
+  ctx.stroke();
+  // Teks
   ctx.lineJoin = 'round';
+  ctx.font = '96px "Lilita One", "Trebuchet MS", sans-serif';
+  ctx.lineWidth = 16;
+  ctx.strokeStyle = '#5A1A10';
+  ctx.strokeText('JURAGAN', W / 2, 108);
+  ctx.fillStyle = '#FFD45A';
+  ctx.fillText('JURAGAN', W / 2, 108);
+  ctx.font = '120px "Lilita One", "Trebuchet MS", sans-serif';
   ctx.lineWidth = 18;
-  ctx.strokeStyle = '#4A2C18';
-  ctx.strokeText('Juragan', W / 2, 110);
-  ctx.fillStyle = '#E3A21A';
-  ctx.fillText('Juragan', W / 2, 110);
-  ctx.strokeText('Nusantara', W / 2, 260);
-  ctx.fillStyle = '#C0392B';
-  ctx.fillText('Nusantara', W / 2, 260);
-  ctx.font = 'italic 700 42px Nunito, sans-serif';
-  ctx.lineWidth = 8;
-  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-  ctx.strokeText('Borong Nusantara, asal kuat bayar iuran.', W / 2, 360);
-  ctx.fillStyle = '#4A2C18';
-  ctx.fillText('Borong Nusantara, asal kuat bayar iuran.', W / 2, 360);
+  ctx.strokeText('NUSANTARA', W / 2, 212);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText('NUSANTARA', W / 2, 212);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+/** Serat kayu meja. */
+export function woodTexture(): THREE.CanvasTexture {
+  const S = 512;
+  const c = document.createElement('canvas');
+  c.width = c.height = S;
+  const ctx = c.getContext('2d')!;
+  const plank = S / 4;
+  for (let i = 0; i < 4; i++) {
+    const base = ['#9A5F34', '#A86A3B', '#925A30', '#A26539'][i];
+    ctx.fillStyle = base;
+    ctx.fillRect(0, i * plank, S, plank);
+    for (let k = 0; k < 14; k++) {
+      ctx.strokeStyle = `rgba(60,30,12,${0.08 + Math.random() * 0.12})`;
+      ctx.lineWidth = 1 + Math.random() * 2;
+      ctx.beginPath();
+      const y = i * plank + Math.random() * plank;
+      ctx.moveTo(0, y);
+      for (let x = 0; x <= S; x += 32) ctx.lineTo(x, y + Math.sin(x / 60 + k) * 3);
+      ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(50,25,10,0.55)';
+    ctx.fillRect(0, i * plank, S, 3);
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(5, 5);
+  tex.anisotropy = 8;
+  return tex;
+}
+
+/** Uang mainan (desain netral, tanpa lambang negara). */
+export function billTexture(label: string, color: string): THREE.CanvasTexture {
+  const W = 256;
+  const H = 128;
+  const c = document.createElement('canvas');
+  c.width = W;
+  c.height = H;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(8, 8, W - 16, H - 16);
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath();
+  ctx.arc(60, 64, 34, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(60,40,20,0.7)';
+  ctx.font = '900 30px "Lilita One", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('JN', 60, 66);
+  ctx.fillStyle = '#2B1A10';
+  ctx.font = '900 34px Nunito, sans-serif';
+  ctx.fillText(label, 168, 66);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
@@ -241,4 +355,145 @@ export function cardBackTexture(deck: 'nasib' | 'warga'): THREE.CanvasTexture {
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
+}
+
+// ===== Tekstur kain & properti karakter =====
+const clothCache = new Map<string, THREE.CanvasTexture>();
+function canvasTex(key: string, w: number, h: number, draw: (ctx: CanvasRenderingContext2D) => void, repeat?: [number, number]) {
+  const hit = clothCache.get(key);
+  if (hit) return hit;
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  draw(c.getContext('2d')!);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  if (repeat) {
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(repeat[0], repeat[1]);
+  }
+  clothCache.set(key, t);
+  return t;
+}
+
+/** Batik coklat (parang/kawung sederhana) untuk kain jarik. */
+export function batikTexture() {
+  return canvasTex('batik', 128, 128, (ctx) => {
+    ctx.fillStyle = '#7A4A22';
+    ctx.fillRect(0, 0, 128, 128);
+    ctx.strokeStyle = '#E9C27A';
+    ctx.lineWidth = 5;
+    for (let i = -128; i < 256; i += 32) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + 128, 128);
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#3B2210';
+    for (let y = 16; y < 128; y += 32)
+      for (let x = 16; x < 128; x += 32) {
+        ctx.beginPath();
+        ctx.ellipse(x, y, 7, 4, Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+  }, [2, 2]);
+}
+
+/** Kebaya ungu bermotif bunga. */
+export function kebayaTexture() {
+  return canvasTex('kebaya', 128, 128, (ctx) => {
+    ctx.fillStyle = '#7B4FA0';
+    ctx.fillRect(0, 0, 128, 128);
+    for (let y = 12; y < 128; y += 30)
+      for (let x = (y / 30) % 2 ? 26 : 10; x < 128; x += 32) {
+        ctx.fillStyle = '#C9A6E3';
+        for (let k = 0; k < 5; k++) {
+          const a = (k / 5) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.arc(x + Math.cos(a) * 5, y + Math.sin(a) * 5, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = '#F2C230';
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+  }, [2, 2]);
+}
+
+/** Sarung kotak-kotak ungu. */
+export function sarungTexture() {
+  return canvasTex('sarung', 128, 128, (ctx) => {
+    ctx.fillStyle = '#6A4C93';
+    ctx.fillRect(0, 0, 128, 128);
+    ctx.globalAlpha = 0.55;
+    ctx.fillStyle = '#B9A3D9';
+    for (let i = 0; i < 128; i += 32) {
+      ctx.fillRect(i, 0, 10, 128);
+      ctx.fillRect(0, i, 128, 10);
+    }
+    ctx.globalAlpha = 0.6;
+    ctx.fillStyle = '#2E1F45';
+    for (let i = 18; i < 128; i += 32) {
+      ctx.fillRect(i, 0, 4, 128);
+      ctx.fillRect(0, i, 128, 4);
+    }
+  }, [2, 2]);
+}
+
+/** Papan nama "KOS". */
+export function kosSignTexture() {
+  return canvasTex('kos', 128, 72, (ctx) => {
+    ctx.fillStyle = '#8A5A35';
+    ctx.fillRect(0, 0, 128, 72);
+    ctx.strokeStyle = '#5A3A22';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(3, 3, 122, 66);
+    ctx.fillStyle = '#FFF3DD';
+    ctx.font = '900 44px Nunito, "Trebuchet MS", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('KOS', 64, 39);
+  });
+}
+
+/** Label nama di atas pion (pil berwarna pemain, teks putih). Mengembalikan tekstur & rasio lebar/tinggi. */
+export function nameTagTexture(text: string, color: string, big: boolean): { tex: THREE.CanvasTexture; aspect: number } {
+  const H = big ? 96 : 64;
+  const font = big ? `${Math.round(H * 0.5)}px "Lilita One", "Trebuchet MS", sans-serif` : `800 ${Math.round(H * 0.46)}px Nunito, sans-serif`;
+  const probe = document.createElement('canvas').getContext('2d')!;
+  probe.font = font;
+  const pad = H * 0.45;
+  const W = Math.ceil(probe.measureText(text).width + pad * 2);
+  const c = document.createElement('canvas');
+  c.width = W;
+  c.height = H;
+  const ctx = c.getContext('2d')!;
+  const r = H / 2 - 4;
+  const bw = big ? 7 : 5;
+  ctx.beginPath();
+  ctx.moveTo(r + 4, 4);
+  ctx.lineTo(W - r - 4, 4);
+  ctx.arc(W - r - 4, H / 2, r, -Math.PI / 2, Math.PI / 2);
+  ctx.lineTo(r + 4, H - 4);
+  ctx.arc(r + 4, H / 2, r, Math.PI / 2, -Math.PI / 2);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = bw;
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.stroke();
+  ctx.font = font;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = big ? 6 : 4;
+  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+  ctx.strokeText(text, W / 2, H / 2 + 2);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(text, W / 2, H / 2 + 2);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return { tex, aspect: W / H };
 }

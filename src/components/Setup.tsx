@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { CONFIG } from '../engine/data.ts';
 import type { NewGameOptions } from '../engine/engine.ts';
 import type { DiceMode, GameMode } from '../engine/types.ts';
-import { DEFAULT_NAMES, PLAYER_COLORS, TOKENS } from '../ui/constants.ts';
+import { DEFAULT_NAMES, PLAYER_COLORS, TOKENS, normalizeToken, tokenInfo } from '../ui/constants.ts';
+import Avatar from './Avatar.tsx';
 import { loadSetup, saveSetup } from '../ui/storage.ts';
 
 interface Props {
@@ -23,7 +24,7 @@ interface SetupState {
 
 const DEFAULT: SetupState = {
   count: 4,
-  names: DEFAULT_NAMES,
+  names: ['', '', '', '', '', ''],
   tokens: TOKENS.slice(0, 6).map((t) => t.id),
   mode: 'klasik',
   diceMode: 'digital',
@@ -33,7 +34,26 @@ const DEFAULT: SetupState = {
 };
 
 export default function Setup({ onBack, onStart }: Props) {
-  const [st, setSt] = useState<SetupState>(() => ({ ...DEFAULT, ...(loadSetup<SetupState>() ?? {}) }));
+  // Nama, pion, dan mode diingat; mode dadu TIDAK diingat, selalu mulai dari acak otomatis.
+  const [st, setSt] = useState<SetupState>(() => {
+    const saved = loadSetup<SetupState>() ?? {};
+    const merged = { ...DEFAULT, ...saved, diceMode: 'digital' as const };
+    // Nama contoh versi lama tidak diisi otomatis lagi; pemain menulis nama sendiri.
+    merged.names = Array.from({ length: 6 }, (_, i) => {
+      const n = (merged.names ?? [])[i] ?? '';
+      return DEFAULT_NAMES.includes(n) ? '' : n;
+    });
+    // Pion versi lama dipetakan ke karakter baru; pastikan tidak ada pion kembar.
+    const seen = new Set<string>();
+    merged.tokens = merged.tokens.map((t, i) => {
+      let id: string = normalizeToken(t);
+      if (seen.has(id)) id = TOKENS.find((x) => !seen.has(x.id))?.id ?? TOKENS[i % TOKENS.length].id;
+      seen.add(id);
+      return id;
+    });
+    while (merged.tokens.length < 6) merged.tokens.push(TOKENS.find((x) => !merged.tokens.includes(x.id))!.id);
+    return merged;
+  });
   const set = (patch: Partial<SetupState>) => setSt((s) => ({ ...s, ...patch }));
 
   const setName = (i: number, v: string) => set({ names: st.names.map((n, j) => (j === i ? v : n)) });
@@ -50,7 +70,8 @@ export default function Setup({ onBack, onStart }: Props) {
     saveSetup(st);
     onStart({
       players: Array.from({ length: st.count }, (_, i) => ({
-        name: st.names[i]?.trim() || `Pemain ${i + 1}`,
+        // Nama kosong → pakai nama karakter pion (mis. "Mas Ojol").
+        name: st.names[i]?.trim() || tokenInfo(st.tokens[i]).label,
         token: st.tokens[i],
         color: PLAYER_COLORS[i],
       })),
@@ -92,6 +113,7 @@ export default function Setup({ onBack, onStart }: Props) {
               <input
                 aria-label={`Nama pemain ${i + 1}`}
                 value={st.names[i] ?? ''}
+                placeholder={`Nama pemain ${i + 1} (kosong = ${tokenInfo(st.tokens[i]).label})`}
                 maxLength={16}
                 onChange={(e) => setName(i, e.target.value)}
               />
@@ -100,11 +122,15 @@ export default function Setup({ onBack, onStart }: Props) {
                   <button
                     key={t.id}
                     title={t.label}
+                    role="radio"
+                    aria-checked={st.tokens[i] === t.id}
                     aria-label={t.label}
                     className={st.tokens[i] === t.id ? 'on' : ''}
+                    style={st.tokens[i] === t.id ? { borderColor: PLAYER_COLORS[i] } : undefined}
                     onClick={() => setToken(i, t.id)}
                   >
-                    {t.emoji}
+                    <Avatar token={t.id} size={46} />
+                    <span>{t.label}</span>
                   </button>
                 ))}
               </div>
@@ -159,12 +185,12 @@ export default function Setup({ onBack, onStart }: Props) {
         <h2>Dadu</h2>
         <div className="mode-cards">
           <button className={`mode-card ${st.diceMode === 'digital' ? 'on' : ''}`} onClick={() => set({ diceMode: 'digital' })}>
-            <strong>📱 Dadu digital</strong>
-            <span>Tekan tombol "Lempar Dadu". Angka diacak oleh browser secara adil.</span>
+            <strong>🎲 Dadu acak otomatis</strong>
+            <span>Tekan "Lempar Dadu", aplikasi mengacak angkanya secara adil. Pilihan yang disarankan.</span>
           </button>
           <button className={`mode-card ${st.diceMode === 'fisik' ? 'on' : ''}`} onClick={() => set({ diceMode: 'fisik' })}>
-            <strong>🎲 Dadu fisik</strong>
-            <span>Lempar dadu sungguhan, lalu masukkan angkanya. Cocok untuk main bareng di meja.</span>
+            <strong>✋ Pakai dadu sungguhan di meja</strong>
+            <span>Hanya jika kamu punya dadu asli: lempar di meja, lalu ketik angkanya di aplikasi.</span>
           </button>
         </div>
       </section>

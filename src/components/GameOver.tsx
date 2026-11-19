@@ -1,7 +1,7 @@
 import { ranking, ownedTiles } from '../engine/engine.ts';
 import { rp } from '../engine/format.ts';
 import type { GameState } from '../engine/types.ts';
-import { tokenEmoji } from '../ui/constants.ts';
+import Avatar from './Avatar.tsx';
 import Modal from './Modal.tsx';
 
 export default function GameOver({ game, onHome, onNewGame }: { game: GameState; onHome: () => void; onNewGame: () => void }) {
@@ -11,9 +11,7 @@ export default function GameOver({ game, onHome, onNewGame }: { game: GameState;
   return (
     <Modal title="🏆 Permainan Selesai" className="modal-gameover">
       <div className="winner" style={{ borderColor: winner.color }}>
-        <span className="winner-token" style={{ background: winner.color }}>
-          {tokenEmoji(winner.token)}
-        </span>
+        <Avatar token={winner.token} size={64} ring={winner.color} />
         <div>
           <div className="small muted">Juragan Nusantara</div>
           <div className="winner-name">{winner.name}</div>

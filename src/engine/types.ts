@@ -284,4 +284,5 @@ export type Action =
   | { type: 'LOAN'; lender: string; borrower: string; principal: number; interestPct: number }
   | { type: 'REPAY_LOAN'; loanId: string }
   | { type: 'END_TURN'; now?: number }
+  | { type: 'SET_DICE_MODE'; mode: DiceMode }
   | { type: 'FINISH_GAME'; reason: string };

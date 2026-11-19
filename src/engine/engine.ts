@@ -1186,6 +1186,13 @@ function handle(s: GameState, a: Action) {
       return;
     }
 
+    case 'SET_DICE_MODE':
+      if (a.mode !== 'digital' && a.mode !== 'fisik') fail('Mode dadu tidak dikenal.');
+      if (s.diceMode === a.mode) return;
+      s.diceMode = a.mode;
+      log(s, a.mode === 'digital' ? 'Dadu diganti ke acak otomatis.' : 'Dadu diganti ke dadu sungguhan di meja.', 'info');
+      return;
+
     case 'FINISH_GAME':
       finishGame(s, a.reason);
       return;
