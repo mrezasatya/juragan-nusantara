@@ -57,3 +57,27 @@ Bot memakai strategi "pemain wajar": beli jika masih punya cadangan Rp 150 jt, m
 2. **Kas Arisan bisa menumpuk besar.** Kas ini hanya bisa diambil lewat 1 dari 50 Kartu Warga (W02). Rata-rata puncaknya Rp 292 jt (Klasik 4 pemain). Pada permainan yang berlangsung lama, kas ini mencapai Rp 1,7 M. Ini bisa jadi "jackpot" yang seru, tetapi juga terlalu acak. Opsi: tambah 1 kartu "Narik Arisan!", atau beri batas maksimum Kas Arisan.
 3. **Kas Warkop** rata-rata memuncak Rp 160–200 jt. Proporsinya wajar sebagai hadiah petak Warkop.
 4. **Kekalahan di Mode Kilat jarang terjadi** (rata-rata 0,5 pemain bangkrut di 15 putaran), sehingga pemenang ditentukan total aset. Ini sesuai tujuan ice breaking.
+
+## 5. Aturan Seru (tambahan setelah playtest pertama)
+
+**Masalah dari playtest:** permainan terasa monoton. Berhenti di properti sendiri tidak memicu apa pun, karena membangun butuh grup warna lengkap yang jarang tercapai. Kartu juga jarang muncul: hanya 5 dari 40 petak yang berupa petak kartu, atau sekitar 0,14 kartu per giliran.
+
+**Solusi:** tiga aturan opsional yang **aktif secara bawaan** di layar *Permainan Baru* dan bisa dimatikan untuk kembali ke aturan klasik sesuai dokumen konsep. Engine sendiri memakai bawaan klasik.
+
+| Aturan | Ketentuan |
+|---|---|
+| Renovasi saat singgah | Berhenti di properti provinsi milik sendiri (tidak digadai) → tawaran +1 Homestay dengan biaya bangun biasa. Tanpa grup lengkap maksimal **3 Homestay** (`config.rules.visitUpgradeMaxLevelWithoutSet`). Resort tetap butuh grup lengkap |
+| Kartu bonus | Dobel → 1 Kartu Nasib. Lewat MULAI → 1 Kartu Warga. Diambil setelah aksi petak. Tidak berlaku bagi pemain yang masuk Hotel Prodeo |
+| Kabar Nusantara | Di awal setiap putaran baru (mulai putaran 2) muncul 1 dari 16 kabar (`src/data/events.json`, 8 baik : 8 sindiran) untuk semua pemain |
+
+**Penyesuaian aturan lain:** dengan renovasi saat singgah, satu grup warna bisa punya bangunan dari beberapa pemilik. Karena itu aturan jual merata, gadai, dan jual-beli kini dihitung **per pemilik** (untuk pemilik grup lengkap hasilnya sama dengan aturan klasik). Dana maksimal yang bisa dikumpulkan saat berutang juga dihitung dengan mensimulasikan jual dan gadai otomatis. Ini menutup bug jalan buntu yang ditemukan simulasi.
+
+**Hasil simulasi** (60 permainan per konfigurasi, 4 pemain, `docs/simulasi-aturan-seru.json`):
+
+| Ukuran | Klasik | Aturan Seru |
+|---|---|---|
+| Kartu per giliran | 0,14 | 0,52 (+1 Kabar Nusantara per putaran) |
+| Median putaran (Mode Klasik) | 47 | 44 |
+| Rata-rata puncak Kas Warkop | Rp 168 jt | Rp 320 jt |
+
+Batas renovasi 2, 3, dan 4 memberi durasi yang hampir sama (median 44 putaran), sehingga dipilih 3. Kas Warkop menjadi "jackpot" yang lebih besar karena banyak kartu dan kabar membayar ke Kas Warkop. Perlu dipantau saat playtest.
