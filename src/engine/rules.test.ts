@@ -150,3 +150,33 @@ describe('📰 Kabar Nusantara', () => {
     expect(cash(s, 'p1')).toBe(1485 - 80);
   });
 });
+
+describe('Regresi: bangunan dari beberapa pemilik dalam satu grup', () => {
+  it('pemain tetap bisa menjual bangunan & menggadai walau pemain lain punya bangunan lebih tinggi di grup yang sama', () => {
+    let s = seru();
+    s = setup(s, (d) => {
+      d.board[6] = { owner: 'p1', level: 1, mortgaged: false };
+      d.board[8] = { owner: 'p2', level: 3, mortgaged: false };
+    });
+    s = act(s, { type: 'SELL_BUILDING', tile: 6 });
+    expect(s.board[6].level).toBe(0);
+    s = act(s, { type: 'MORTGAGE', tile: 6 });
+    expect(s.board[6].mortgaged).toBe(true);
+  });
+
+  it('tidak ada jalan buntu: jika dana tak cukup setelah jual & gadai otomatis, bangkrut tersedia', () => {
+    let s = seru(2);
+    s = setup(s, (d) => {
+      d.board[6] = { owner: 'p1', level: 1, mortgaged: false };
+      d.board[8] = { owner: 'p2', level: 3, mortgaged: false };
+      d.board[39] = { owner: 'p2', level: 5, mortgaged: false };
+      d.players[0].cash = 10;
+      d.players[0].position = 36;
+    });
+    s = act(s, { type: 'ROLL', dice: [1, 2] }); // ke Raja Ampat (Resort milik p2)
+    expect(s.prompt?.type).toBe('debt');
+    s = act(s, { type: 'AUTO_LIQUIDATE' });
+    s = act(s, { type: 'DECLARE_BANKRUPTCY' });
+    expect(s.phase).toBe('gameOver');
+  });
+});

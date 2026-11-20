@@ -294,13 +294,19 @@ export const loanPenaltyDue = (principal: number, interestPct: number) =>
 
 /** Uang maksimal yang bisa dikumpulkan dengan menjual semua bangunan & menggadaikan semua properti. */
 export function liquidationValue(s: GameState, playerId: string): number {
-  let v = getPlayer(s, playerId).cash;
-  for (const i of ownedTiles(s, playerId)) {
-    const o = s.board[i];
-    if (o.level > 0) v += o.level * sellValue(i);
-    if (!o.mortgaged) v += ownable(i).mortgage;
-  }
-  return v;
+  // Dihitung dengan benar-benar menjalankan jual & gadai otomatis pada salinan state,
+  // supaya angka ini selalu bisa dicapai (tidak ada jalan buntu "dana cukup tapi tak bisa dicairkan").
+  const copy = structuredClone(s);
+  copy.log = [];
+  autoLiquidate(copy, playerId, Infinity);
+  return getPlayer(copy, playerId).cash;
+}
+
+/** Petak dalam grup warna yang sama yang dimiliki pemain tertentu (aturan merata/gadai per pemilik). */
+function ownMembers(s: GameState, playerId: string, tileIndex: number): number[] {
+  const t = TILES[tileIndex];
+  if (t.kind !== 'property') return [tileIndex];
+  return groupMembers(t.group).filter((i) => s.board[i].owner === playerId);
 }
 
 export function canBuild(s: GameState, playerId: string, tileIndex: number, ignoreCash = false): boolean {
@@ -320,7 +326,8 @@ export function canSellBuilding(s: GameState, playerId: string, tileIndex: numbe
   if (t.kind !== 'property') return false;
   const o = s.board[tileIndex];
   if (o.owner !== playerId || o.level === 0) return false;
-  const maxLevel = Math.max(...groupMembers(t.group).map((i) => s.board[i].level));
+  // Merata dihitung terhadap petak milik pemain ini saja (dengan Aturan Seru, satu grup bisa punya bangunan dari beberapa pemilik).
+  const maxLevel = Math.max(...ownMembers(s, playerId, tileIndex).map((i) => s.board[i].level));
   return o.level >= maxLevel;
 }
 
@@ -329,7 +336,7 @@ export function canMortgage(s: GameState, playerId: string, tileIndex: number): 
   if (!isOwnable(t)) return false;
   const o = s.board[tileIndex];
   if (o.owner !== playerId || o.mortgaged) return false;
-  if (t.kind === 'property') return groupMembers(t.group).every((i) => s.board[i].level === 0);
+  if (t.kind === 'property') return ownMembers(s, playerId, tileIndex).every((i) => s.board[i].level === 0);
   return true;
 }
 
@@ -342,7 +349,7 @@ export function canUnmortgage(s: GameState, playerId: string, tileIndex: number)
 export function canTradeTile(s: GameState, playerId: string, tileIndex: number): boolean {
   const t = TILES[tileIndex];
   if (!isOwnable(t) || s.board[tileIndex].owner !== playerId) return false;
-  if (t.kind === 'property') return groupMembers(t.group).every((i) => s.board[i].level === 0);
+  if (t.kind === 'property') return ownMembers(s, playerId, tileIndex).every((i) => s.board[i].level === 0);
   return true;
 }
 
