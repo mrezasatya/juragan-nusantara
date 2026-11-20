@@ -22,6 +22,7 @@ Proyek hiburan non-komersial. Spesifikasi lengkap ada di [`docs/konsep-game-jura
 - **8 pion karakter** bergaya figurin chibi di atas alas bundar berwarna pemain: Mas Ojol, Pak Kos, Bu Warung, Mas Kantoran, Pak PNS, Adik SD, Bang Punk, dan Mas Mie Ayam, masing-masing dengan kostum, pose, dan properti khas.
 - Papan di atas **meja kayu**, dengan landmark 3D di tengah (Monas, bendera Merah Putih, Pura Meru, Rumah Gadang, Tongkonan, Honai, komodo), logo pita, kotak kartu, uang mainan, dan kotak game.
 - **Penanda giliran**: panah & label nama di atas pion aktif, label nama di atas semua pion, spanduk giliran, dan pengumuman saat giliran berganti. Potret karakter dipakai di pemilihan pion, panel pemain, dan layar pemenang. Nama pemain ditulis sendiri (kosong = nama karakter).
+- **Aturan Seru** (opsional, aktif secara bawaan): renovasi +1 Homestay saat singgah di properti sendiri, kartu bonus (dobel → Kartu Nasib, lewat MULAI → Kartu Warga), dan **Kabar Nusantara** (16 kejadian untuk semua pemain di awal tiap putaran, `src/data/events.json`).
 - **Galeri 3D** di beranda untuk melihat 8 rumah adat, versi Resort, dan 8 karakter pion.
 
 ## Menjalankan
@@ -52,6 +53,7 @@ Semua nominal dalam satuan **juta Rupiah**.
 | File | Isi |
 |---|---|
 | `src/data/config.json` | Modal awal, gaji, iuran arisan, denda Hotel Prodeo, tarif Pos Pungli, sewa transportasi/utilitas, aturan utang, default Mode Kilat |
+| `src/data/events.json` | 16 Kabar Nusantara (Aturan Seru): judul, teks, efek untuk semua pemain |
 | `src/data/cards.json` | 100 kartu: judul, teks, keterangan efek, dan objek `effect` (jenis efek & nominal) |
 | `src/data/tiles.json` | 40 petak: harga, sewa, nilai gadai, fakta, sapaan daerah |
 | `docs/cara-main.md` | Buku aturan. Halaman "Cara Main" di aplikasi membaca file ini langsung |

@@ -2,12 +2,15 @@ import tilesJson from '../data/tiles.json';
 import cardsJson from '../data/cards.json';
 import groupsJson from '../data/groups.json';
 import configJson from '../data/config.json';
-import type { Card, GameConfig, GroupId, GroupInfo, OwnableTile, PropertyTile, Tile } from './types.ts';
+import eventsJson from '../data/events.json';
+import type { Card, GameConfig, GroupId, GroupInfo, KabarEvent, OwnableTile, PropertyTile, Tile } from './types.ts';
 
 export const TILES = tilesJson as Tile[];
 export const CARDS = cardsJson as Card[];
 export const GROUPS = groupsJson as GroupInfo[];
 export const CONFIG = configJson as GameConfig;
+export const EVENTS = eventsJson as KabarEvent[];
+export const EVENT_BY_ID: Record<string, KabarEvent> = Object.fromEntries(EVENTS.map((e) => [e.id, e]));
 
 export const CARD_BY_ID: Record<string, Card> = Object.fromEntries(CARDS.map((c) => [c.id, c]));
 export const GROUP_BY_ID = Object.fromEntries(GROUPS.map((g) => [g.id, g])) as Record<GroupId, GroupInfo>;

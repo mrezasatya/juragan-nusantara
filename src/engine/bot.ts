@@ -63,6 +63,10 @@ export function botAction(s: GameState, profile: BotProfile = DEFAULT_BOT): Acti
       }
       case 'jailRoll':
         return { type: 'ROLL' };
+      case 'upgrade':
+        return { type: 'UPGRADE', accept: getPlayer(s, pr.player).cash - pr.cost >= profile.reserve + 50 };
+      case 'event':
+        return { type: 'EVENT_OK' };
     }
   }
 

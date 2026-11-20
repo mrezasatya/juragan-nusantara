@@ -97,6 +97,35 @@ export interface Card {
   effect: CardEffect;
 }
 
+// ===== Aturan Seru (opsional) & Kabar Nusantara =====
+export interface GameRules {
+  /** Berhenti di properti sendiri → tawaran +1 Homestay walau grup belum lengkap. */
+  visitUpgrade: boolean;
+  /** Dobel → ambil Kartu Nasib; lewat MULAI → ambil Kartu Warga. */
+  bonusCards: boolean;
+  /** Setiap awal putaran ada satu Kabar Nusantara untuk semua pemain. */
+  roundEvents: boolean;
+}
+
+export type KabarEffect =
+  | { type: 'ALL_RECEIVE'; amount: number }
+  | { type: 'ALL_PAY'; amount: number; to: PayTarget }
+  | { type: 'POOREST_BONUS'; amount: number }
+  | { type: 'RICHEST_PAY'; amount: number; to: PayTarget }
+  | { type: 'ARISAN_BONUS'; amount: number }
+  | { type: 'ALL_RECEIVE_PER_BUILDING'; perHomestay: number; perResort: number }
+  | { type: 'ALL_PAY_PER_BUILDING'; perHomestay: number; perResort: number; to: PayTarget }
+  | { type: 'EVERYONE_HELPS_POOREST'; amount: number };
+
+export interface KabarEvent {
+  id: string;
+  side: 'kebaikan' | 'sindiran';
+  title: string;
+  text: string;
+  effectText: string;
+  effect: KabarEffect;
+}
+
 export interface GameConfig {
   startMoney: number;
   salary: number;
@@ -111,6 +140,7 @@ export interface GameConfig {
   auction: { startBid: number };
   loan: { maxInterestPct: number; dueRounds: number; penaltyPct: number };
   kilat: { startingProperties: number; defaultRounds: number; defaultMinutes: number };
+  rules: { visitUpgradeMaxLevelWithoutSet: number };
 }
 
 // ===== State permainan =====
@@ -180,7 +210,8 @@ export type Task =
   | { t: 'moveTo'; player: string; tile: number; salary: boolean; rentMultiplier?: number }
   | { t: 'land'; player: string; rentMultiplier?: number }
   | { t: 'goToJail'; player: string; reason: string }
-  | { t: 'draw'; player: string; deck: DeckId }
+  | { t: 'draw'; player: string; deck: DeckId; bonus?: 'dobel' | 'mulai' }
+  | { t: 'roundEvent' }
   | { t: 'effect'; player: string; cardId: string }
   | { t: 'releaseCard'; cardId: string }
   | { t: 'leaveJail'; player: string };
@@ -200,7 +231,9 @@ export type Prompt =
   | { type: 'pungli'; player: string }
   | { type: 'freeBuilding'; player: string; tiles: number[] }
   | { type: 'debt'; player: string; amount: number; to: Creditor; reason: string; allowSurrender: boolean }
-  | { type: 'jailRoll'; player: string }; // pemain di Hotel Prodeo memilih cara keluar
+  | { type: 'jailRoll'; player: string } // pemain di Hotel Prodeo memilih cara keluar
+  | { type: 'upgrade'; player: string; tile: number; cost: number; level: number }
+  | { type: 'event'; eventId: string };
 
 export type CardOption = 'ok' | 'skip' | 'pay' | 'shield' | 'roll';
 
@@ -225,6 +258,10 @@ export interface GameState {
   version: 1;
   mode: GameMode;
   diceMode: DiceMode;
+  /** Aturan Seru; tidak ada pada simpanan lama (dianggap semua mati). */
+  rules?: GameRules;
+  kabar?: { draw: string[]; discard: string[] };
+  lastEvent?: { eventId: string; seq: number } | null;
   kilat: { maxRounds: number | null; endsAt: number | null } | null;
   players: Player[];
   current: number; // indeks pemain yang sedang giliran
@@ -285,4 +322,6 @@ export type Action =
   | { type: 'REPAY_LOAN'; loanId: string }
   | { type: 'END_TURN'; now?: number }
   | { type: 'SET_DICE_MODE'; mode: DiceMode }
+  | { type: 'UPGRADE'; accept: boolean }
+  | { type: 'EVENT_OK' }
   | { type: 'FINISH_GAME'; reason: string };

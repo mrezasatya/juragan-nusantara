@@ -158,6 +158,14 @@ Kartu **Iklan Pinjol Menggoda** memberi Rp 50 jt sekarang, tetapi kamu **wajib b
 - Bangkrut karena tagihan pemain lain: semua uang, properti, dan kartu simpanmu diserahkan ke pemain itu.
 - Bangkrut karena Bank atau Kas: properti kembali ke Bank tanpa pemilik.
 
+## Aturan Seru (opsional, aktif secara bawaan)
+
+Tambahan supaya permainan tidak monoton. Ketiganya bisa dimatikan di layar **Permainan Baru**. Matikan semuanya untuk memakai aturan klasik.
+
+- 🏠 **Renovasi saat singgah:** jika berhenti di properti provinsi milikmu (tidak digadai), kamu ditawari membangun **+1 Homestay** dengan biaya bangun biasa, walau grup warnanya belum lengkap. Tanpa grup lengkap ada batas jumlah Homestay; **Resort tetap butuh grup lengkap**. Membangun lewat **Kelola Aset** tetap mengikuti aturan biasa (grup lengkap, merata).
+- 🎴 **Kartu bonus:** dadu **dobel** → ambil 1 **Kartu Nasib**. **Lewat MULAI** → ambil 1 **Kartu Warga**. Kartu bonus diambil setelah aksi petak selesai, dan tidak berlaku jika kamu masuk Hotel Prodeo.
+- 📰 **Kabar Nusantara:** di awal setiap putaran baru muncul satu kabar yang berlaku untuk **semua pemain**, misalnya libur panjang (semua dapat uang), harga BBM naik (semua bayar), subsidi untuk pemain termiskin, atau pajak bangunan naik. Isinya 16 kabar: 8 kabar baik dan 8 sindiran.
+
 ## Mode Permainan
 
 | Mode | Untuk siapa | Durasi | Aturan khusus |

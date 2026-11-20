@@ -17,9 +17,11 @@ export default function PlayersPanel({ game, onTile }: { game: GameState; onTile
               <Avatar token={p.token} size={38} ring={p.color} />
               <span className="player-name">
                 <strong>{p.name}</strong>
-                <small>{tokenInfo(p.token).label}</small>
+                <small>
+                  {tokenInfo(p.token).label}
+                  {idx === game.current && !p.bankrupt && game.phase !== 'gameOver' && <span className="turn-badge">▶ GILIRAN</span>}
+                </small>
               </span>
-              {idx === game.current && !p.bankrupt && game.phase !== 'gameOver' && <span className="turn-badge">▶ GILIRAN</span>}
               <span className="player-cash">{p.bankrupt ? 'Bangkrut' : rp(p.cash)}</span>
             </div>
             {!p.bankrupt && (

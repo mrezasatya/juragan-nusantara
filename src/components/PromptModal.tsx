@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Dispatch } from '../App.tsx';
-import { CARD_BY_ID, CONFIG, TILES, ownable } from '../engine/data.ts';
+import { CARD_BY_ID, CONFIG, EVENT_BY_ID, TILES, ownable } from '../engine/data.ts';
 import { getPlayer, liquidationValue, ownedTiles, tileAssetValue, totalAssets } from '../engine/engine.ts';
 import { rp } from '../engine/format.ts';
 import type { CardOption, Creditor, GameState } from '../engine/types.ts';
@@ -188,6 +188,55 @@ export default function PromptModal({ game, dispatch, onManage }: Props) {
 
     case 'jailRoll':
       return null;
+
+    case 'upgrade': {
+      const p = getPlayer(game, pr.player);
+      const t = TILES[pr.tile];
+      const what = pr.level === 5 ? 'Resort' : `Homestay ke-${pr.level}`;
+      return (
+        <Modal title={`🏗️ Singgah di properti sendiri`} className="modal-prompt">
+          <PropertyCard game={game} index={pr.tile} compact />
+          <p className="prompt-line">
+            {p.name}, mau renovasi <strong>{t.short}</strong> jadi <strong>{what}</strong>? Sewa untuk tamu berikutnya naik.
+          </p>
+          <p className="small muted">Uangmu {rp(p.cash)}.</p>
+          <div className="prompt-actions">
+            <button className="btn btn-primary btn-lg" onClick={() => dispatch({ type: 'UPGRADE', accept: true })}>
+              🏠 Renovasi {rp(pr.cost)}
+            </button>
+            <button className="btn" onClick={() => dispatch({ type: 'UPGRADE', accept: false })}>
+              Nanti saja
+            </button>
+          </div>
+        </Modal>
+      );
+    }
+
+    case 'event': {
+      const ev = EVENT_BY_ID[pr.eventId];
+      const good = ev.side === 'kebaikan';
+      return (
+        <Modal title="📰 Kabar Nusantara" className="modal-prompt modal-card">
+          <article className="game-card deck-kabar">
+            <header className="game-card-head">
+              <span className="game-card-deck">Kabar Nusantara · Putaran {game.round}</span>
+              <span className={`ribbon ${good ? 'ribbon-good' : 'ribbon-satire'}`}>{good ? '🇮🇩' : '😏'}</span>
+            </header>
+            <div className="game-card-body">
+              <h3>{ev.title}</h3>
+              <p className="game-card-text">{ev.text}</p>
+              <div className="game-card-effect">{ev.effectText}</div>
+            </div>
+            <footer className="game-card-foot">Berlaku untuk semua pemain · {ev.id}</footer>
+          </article>
+          <div className="prompt-actions">
+            <button className="btn btn-primary btn-lg" onClick={() => dispatch({ type: 'EVENT_OK' })}>
+              OK, jalankan
+            </button>
+          </div>
+        </Modal>
+      );
+    }
   }
 }
 

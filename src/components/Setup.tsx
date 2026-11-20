@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CONFIG } from '../engine/data.ts';
 import type { NewGameOptions } from '../engine/engine.ts';
-import type { DiceMode, GameMode } from '../engine/types.ts';
+import type { DiceMode, GameMode, GameRules } from '../engine/types.ts';
 import { DEFAULT_NAMES, PLAYER_COLORS, TOKENS, normalizeToken, tokenInfo } from '../ui/constants.ts';
 import Avatar from './Avatar.tsx';
 import { loadSetup, saveSetup } from '../ui/storage.ts';
@@ -20,6 +20,7 @@ interface SetupState {
   limitType: 'rounds' | 'minutes';
   rounds: number;
   minutes: number;
+  rules: GameRules;
 }
 
 const DEFAULT: SetupState = {
@@ -31,13 +32,14 @@ const DEFAULT: SetupState = {
   limitType: 'rounds',
   rounds: CONFIG.kilat.defaultRounds,
   minutes: CONFIG.kilat.defaultMinutes,
+  rules: { visitUpgrade: true, bonusCards: true, roundEvents: true },
 };
 
 export default function Setup({ onBack, onStart }: Props) {
   // Nama, pion, dan mode diingat; mode dadu TIDAK diingat, selalu mulai dari acak otomatis.
   const [st, setSt] = useState<SetupState>(() => {
     const saved = loadSetup<SetupState>() ?? {};
-    const merged = { ...DEFAULT, ...saved, diceMode: 'digital' as const };
+    const merged = { ...DEFAULT, ...saved, diceMode: 'digital' as const, rules: { ...DEFAULT.rules, ...((saved as Partial<SetupState>).rules ?? {}) } };
     // Nama contoh versi lama tidak diisi otomatis lagi; pemain menulis nama sendiri.
     merged.names = Array.from({ length: 6 }, (_, i) => {
       const n = (merged.names ?? [])[i] ?? '';
@@ -77,6 +79,7 @@ export default function Setup({ onBack, onStart }: Props) {
       })),
       mode: st.mode,
       diceMode: st.diceMode,
+      rules: st.rules,
       kilatRounds: st.mode === 'kilat' && st.limitType === 'rounds' ? st.rounds : null,
       kilatMinutes: st.mode === 'kilat' && st.limitType === 'minutes' ? st.minutes : null,
     });
@@ -179,6 +182,28 @@ export default function Setup({ onBack, onStart }: Props) {
             </p>
           </div>
         )}
+      </section>
+
+      <section className="setup-section">
+        <h2>Aturan Seru</h2>
+        <p className="hint" style={{ marginTop: 0 }}>Tambahan supaya permainan tidak monoton. Matikan semua untuk aturan klasik.</p>
+        <div className="rule-list">
+          {(
+            [
+              ['visitUpgrade', '🏠 Renovasi saat singgah', `Berhenti di properti sendiri → boleh bangun +1 Homestay walau grup belum lengkap (maks. ${CONFIG.rules.visitUpgradeMaxLevelWithoutSet} Homestay; Resort tetap butuh grup lengkap).`],
+              ['bonusCards', '🎴 Kartu bonus', 'Dadu dobel → ambil Kartu Nasib. Lewat MULAI → ambil Kartu Warga.'],
+              ['roundEvents', '📰 Kabar Nusantara', 'Setiap awal putaran ada satu kejadian untuk semua pemain: rezeki atau sindiran.'],
+            ] as const
+          ).map(([key, title, desc]) => (
+            <label key={key} className="rule-item">
+              <input type="checkbox" checked={st.rules[key]} onChange={(e) => set({ rules: { ...st.rules, [key]: e.target.checked } })} />
+              <span>
+                <strong>{title}</strong>
+                <small>{desc}</small>
+              </span>
+            </label>
+          ))}
+        </div>
       </section>
 
       <section className="setup-section">
