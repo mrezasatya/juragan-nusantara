@@ -1,0 +1,81 @@
+{
+  "games": 60,
+  "klasik": {
+    "games": 60,
+    "errors": 0,
+    "finished": 60,
+    "avgRounds": 51.4,
+    "medianRounds": 47,
+    "p90Rounds": 82,
+    "avgTurns": 172.1,
+    "avgBankrupt": 3,
+    "avgMaxWarkop": 168.2,
+    "avgMaxArisan": 275.5,
+    "kartuPerGiliran": 0.14
+  },
+  "seru_batas2": {
+    "games": 60,
+    "errors": 0,
+    "finished": 60,
+    "avgRounds": 47.8,
+    "medianRounds": 44,
+    "p90Rounds": 72,
+    "avgTurns": 156.6,
+    "avgBankrupt": 3,
+    "avgMaxWarkop": 319,
+    "avgMaxArisan": 283.7,
+    "kartuPerGiliran": 0.52
+  },
+  "seru_batas3": {
+    "games": 60,
+    "errors": 0,
+    "finished": 60,
+    "avgRounds": 49,
+    "medianRounds": 44,
+    "p90Rounds": 77,
+    "avgTurns": 158.9,
+    "avgBankrupt": 3,
+    "avgMaxWarkop": 324.7,
+    "avgMaxArisan": 284.2,
+    "kartuPerGiliran": 0.52
+  },
+  "seru_batas4": {
+    "games": 60,
+    "errors": 0,
+    "finished": 60,
+    "avgRounds": 49.4,
+    "medianRounds": 44,
+    "p90Rounds": 77,
+    "avgTurns": 159.5,
+    "avgBankrupt": 3,
+    "avgMaxWarkop": 324.7,
+    "avgMaxArisan": 285.3,
+    "kartuPerGiliran": 0.52
+  },
+  "kilat_klasik": {
+    "games": 60,
+    "errors": 0,
+    "finished": 60,
+    "avgRounds": 14.9,
+    "medianRounds": 15,
+    "p90Rounds": 15,
+    "avgTurns": 58.1,
+    "avgBankrupt": 0.4,
+    "avgMaxWarkop": 95.4,
+    "avgMaxArisan": 87.3,
+    "kartuPerGiliran": 0.15
+  },
+  "kilat_seru": {
+    "games": 60,
+    "errors": 0,
+    "finished": 60,
+    "avgRounds": 15,
+    "medianRounds": 15,
+    "p90Rounds": 15,
+    "avgTurns": 57.1,
+    "avgBankrupt": 0.5,
+    "avgMaxWarkop": 188.7,
+    "avgMaxArisan": 126.3,
+    "kartuPerGiliran": 0.51
+  }
+}

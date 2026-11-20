@@ -2,7 +2,7 @@
 // reduce(state, action) → state baru. Semua efek berantai dijalankan lewat antrean
 // tugas (state.queue) sampai ada keputusan yang harus diambil pemain (state.prompt).
 
-import { CARD_BY_ID, CONFIG, GROUP_BY_ID, TILES, TRANSPORT_INDEXES, UTILITY_INDEXES, groupMembers, isOwnable, ownable, PROPERTY_TILES } from './data.ts';
+import { CARD_BY_ID, CONFIG, EVENT_BY_ID, EVENTS, GROUP_BY_ID, TILES, TRANSPORT_INDEXES, UTILITY_INDEXES, groupMembers, isOwnable, ownable, PROPERTY_TILES } from './data.ts';
 import { rp } from './format.ts';
 import { nextRandom } from './rng.ts';
 import type {
@@ -12,6 +12,8 @@ import type {
   CardOption,
   Creditor,
   DeckId,
+  GameRules,
+  KabarEvent,
   DiceMode,
   GameMode,
   GameState,
@@ -44,9 +46,15 @@ export interface NewGameOptions {
   diceMode?: DiceMode;
   kilatRounds?: number | null;
   kilatMinutes?: number | null;
+  /** Aturan Seru. Bawaan engine: semua mati (aturan klasik sesuai dokumen konsep). */
+  rules?: Partial<GameRules>;
   seed: number;
   now?: number;
 }
+
+export const RULES_OFF: GameRules = { visitUpgrade: false, bonusCards: false, roundEvents: false };
+export const RULES_ON: GameRules = { visitUpgrade: true, bonusCards: true, roundEvents: true };
+const rulesOf = (s: GameState): GameRules => s.rules ?? RULES_OFF;
 
 export function createGame(opts: NewGameOptions): GameState {
   if (opts.players.length < 2 || opts.players.length > 6) fail('Jumlah pemain harus 2–6.');
@@ -55,6 +63,9 @@ export function createGame(opts: NewGameOptions): GameState {
     version: 1,
     mode: opts.mode,
     diceMode: opts.diceMode ?? 'digital',
+    rules: { ...RULES_OFF, ...(opts.rules ?? {}) },
+    kabar: { draw: [], discard: [] },
+    lastEvent: null,
     kilat:
       opts.mode === 'kilat'
         ? {
@@ -113,6 +124,7 @@ export function createGame(opts: NewGameOptions): GameState {
         .map((c) => c.id),
     );
   }
+  s.kabar!.draw = shuffle(s, EVENTS.map((e) => e.id));
   // Initial bank ledger: modal awal dibayar Bank.
   s.bank = -CONFIG.startMoney * s.players.length;
   log(s, `Permainan dimulai — Mode ${s.mode === 'kilat' ? 'Kilat' : 'Klasik'}, ${s.players.length} pemain. Modal awal ${rp(CONFIG.startMoney)}.`, 'info');
@@ -282,13 +294,19 @@ export const loanPenaltyDue = (principal: number, interestPct: number) =>
 
 /** Uang maksimal yang bisa dikumpulkan dengan menjual semua bangunan & menggadaikan semua properti. */
 export function liquidationValue(s: GameState, playerId: string): number {
-  let v = getPlayer(s, playerId).cash;
-  for (const i of ownedTiles(s, playerId)) {
-    const o = s.board[i];
-    if (o.level > 0) v += o.level * sellValue(i);
-    if (!o.mortgaged) v += ownable(i).mortgage;
-  }
-  return v;
+  // Dihitung dengan benar-benar menjalankan jual & gadai otomatis pada salinan state,
+  // supaya angka ini selalu bisa dicapai (tidak ada jalan buntu "dana cukup tapi tak bisa dicairkan").
+  const copy = structuredClone(s);
+  copy.log = [];
+  autoLiquidate(copy, playerId, Infinity);
+  return getPlayer(copy, playerId).cash;
+}
+
+/** Petak dalam grup warna yang sama yang dimiliki pemain tertentu (aturan merata/gadai per pemilik). */
+function ownMembers(s: GameState, playerId: string, tileIndex: number): number[] {
+  const t = TILES[tileIndex];
+  if (t.kind !== 'property') return [tileIndex];
+  return groupMembers(t.group).filter((i) => s.board[i].owner === playerId);
 }
 
 export function canBuild(s: GameState, playerId: string, tileIndex: number, ignoreCash = false): boolean {
@@ -308,7 +326,8 @@ export function canSellBuilding(s: GameState, playerId: string, tileIndex: numbe
   if (t.kind !== 'property') return false;
   const o = s.board[tileIndex];
   if (o.owner !== playerId || o.level === 0) return false;
-  const maxLevel = Math.max(...groupMembers(t.group).map((i) => s.board[i].level));
+  // Merata dihitung terhadap petak milik pemain ini saja (dengan Aturan Seru, satu grup bisa punya bangunan dari beberapa pemilik).
+  const maxLevel = Math.max(...ownMembers(s, playerId, tileIndex).map((i) => s.board[i].level));
   return o.level >= maxLevel;
 }
 
@@ -317,7 +336,7 @@ export function canMortgage(s: GameState, playerId: string, tileIndex: number): 
   if (!isOwnable(t)) return false;
   const o = s.board[tileIndex];
   if (o.owner !== playerId || o.mortgaged) return false;
-  if (t.kind === 'property') return groupMembers(t.group).every((i) => s.board[i].level === 0);
+  if (t.kind === 'property') return ownMembers(s, playerId, tileIndex).every((i) => s.board[i].level === 0);
   return true;
 }
 
@@ -330,7 +349,7 @@ export function canUnmortgage(s: GameState, playerId: string, tileIndex: number)
 export function canTradeTile(s: GameState, playerId: string, tileIndex: number): boolean {
   const t = TILES[tileIndex];
   if (!isOwnable(t) || s.board[tileIndex].owner !== playerId) return false;
-  if (t.kind === 'property') return groupMembers(t.group).every((i) => s.board[i].level === 0);
+  if (t.kind === 'property') return ownMembers(s, playerId, tileIndex).every((i) => s.board[i].level === 0);
   return true;
 }
 
@@ -399,8 +418,16 @@ function execTask(s: GameState, task: Task) {
       return execLand(s, task.player, task.rentMultiplier ?? 1);
     case 'goToJail':
       return sendToJail(s, task.player, task.reason);
-    case 'draw':
+    case 'draw': {
+      if (task.bonus) {
+        const p = getPlayer(s, task.player);
+        if (p.bankrupt || p.inJail) return;
+        log(s, task.bonus === 'dobel' ? `🎴 Bonus dobel: ${p.name} ambil Kartu Nasib!` : `🎴 Bonus lewat MULAI: ${p.name} ambil Kartu Warga!`, 'card');
+      }
       return execDraw(s, task.player, task.deck);
+    }
+    case 'roundEvent':
+      return execRoundEvent(s);
     case 'effect':
       return applyEffect(s, task.player, CARD_BY_ID[task.cardId]);
     case 'releaseCard':
@@ -465,10 +492,11 @@ function execMove(s: GameState, playerId: string, steps: number) {
   p.position = to;
   pushMove(s, p.id, from, to, steps >= 0 ? 'walk' : 'back');
   const extra: Task[] = [];
-  if (steps > 0 && raw >= BOARD_SIZE) extra.push(...paySalary(s, p.id));
+  const passed = steps > 0 && raw >= BOARD_SIZE;
+  if (passed) extra.push(...paySalary(s, p.id));
   if (steps < 0) log(s, `${p.name} mundur ${-steps} petak ke ${TILES[to].short}.`, 'info');
   else log(s, `${p.name} maju ${steps} petak ke ${TILES[to].short}.`, 'info');
-  s.queue.unshift(...extra, { t: 'land', player: p.id });
+  s.queue.unshift(...extra, { t: 'land', player: p.id }, ...startBonus(s, p.id, passed));
 }
 
 function execMoveTo(s: GameState, playerId: string, tile: number, salary: boolean, rentMultiplier?: number) {
@@ -479,7 +507,24 @@ function execMoveTo(s: GameState, playerId: string, tile: number, salary: boolea
   pushMove(s, p.id, from, tile, salary ? 'walk' : 'jump');
   log(s, `${p.name} pindah ke ${TILES[tile].short}.`, 'info');
   const extra: Task[] = passes ? paySalary(s, p.id) : [];
-  s.queue.unshift(...extra, { t: 'land', player: p.id, rentMultiplier });
+  s.queue.unshift(...extra, { t: 'land', player: p.id, rentMultiplier }, ...startBonus(s, p.id, passes));
+}
+
+/** Aturan Seru: lewat MULAI → bonus 1 Kartu Warga (diambil setelah aksi petak selesai). */
+function startBonus(s: GameState, playerId: string, passed: boolean): Task[] {
+  return passed && rulesOf(s).bonusCards ? [{ t: 'draw', player: playerId, deck: 'warga', bonus: 'mulai' }] : [];
+}
+
+/** Boleh renovasi saat singgah? Tanpa grup lengkap dibatasi level; Resort butuh grup lengkap. */
+export function canVisitUpgrade(s: GameState, playerId: string, tileIndex: number): boolean {
+  const t = TILES[tileIndex];
+  if (t.kind !== 'property') return false;
+  const o = s.board[tileIndex];
+  if (o.owner !== playerId || o.mortgaged || o.level >= 5) return false;
+  if (getPlayer(s, playerId).cash < t.buildCost) return false;
+  const full = groupMembers(t.group).every((i) => s.board[i].owner === playerId && !s.board[i].mortgaged);
+  if (full) return true;
+  return o.level < Math.min(4, CONFIG.rules.visitUpgradeMaxLevelWithoutSet);
 }
 
 function sendToJail(s: GameState, playerId: string, reason: string) {
@@ -506,7 +551,14 @@ function execLand(s: GameState, playerId: string, rentMultiplier: number) {
         s.prompt = { type: 'buy', player: p.id, tile: tile.index };
         return;
       }
-      if (o.owner === p.id) return;
+      if (o.owner === p.id) {
+        // Aturan Seru: singgah di properti sendiri → tawaran renovasi +1 bangunan
+        if (rulesOf(s).visitUpgrade && canVisitUpgrade(s, p.id, tile.index)) {
+          const t = TILES[tile.index] as Extract<(typeof TILES)[number], { kind: 'property' }>;
+          s.prompt = { type: 'upgrade', player: p.id, tile: tile.index, cost: t.buildCost, level: o.level + 1 };
+        }
+        return;
+      }
       if (o.mortgaged) {
         log(s, `${tile.short} sedang digadaikan, ${p.name} tidak perlu bayar sewa.`, 'info');
         return;
@@ -796,10 +848,12 @@ function finishGame(s: GameState, reason: string) {
 function advanceTurn(s: GameState) {
   const n = s.players.length;
   let idx = s.current;
+  let newRound = false;
   for (let guard = 0; guard < n * 10; guard++) {
     const next = (idx + 1) % n;
     if (next <= idx) {
       s.round += 1;
+      newRound = true;
       if (s.kilat?.maxRounds && s.round > s.kilat.maxRounds) {
         s.round = s.kilat.maxRounds;
         finishGame(s, `batas ${s.kilat.maxRounds} putaran tercapai`);
@@ -825,13 +879,16 @@ function advanceTurn(s: GameState) {
   s.phase = 'preRoll';
   s.prompt = null;
   log(s, `Giliran ${p.name}${p.inJail ? ' (di Hotel Prodeo)' : ''}.`, 'info');
+  const tasks: Task[] = [];
+  // Aturan Seru: Kabar Nusantara di awal setiap putaran baru
+  if (newRound && rulesOf(s).roundEvents) tasks.push({ t: 'roundEvent' });
   // Utang antarpemain yang jatuh tempo ditagih "di grup chat RT".
   const due = s.loans.filter((l) => l.borrower === p.id && s.round >= l.dueRound);
-  if (due.length) {
-    for (const l of due) log(s, `📱 Utang ${p.name} ke ${nameOf(s, l.lender)} ditagih di grup chat RT (+denda ${CONFIG.loan.penaltyPct}%)!`, 'bad');
+  for (const l of due) log(s, `📱 Utang ${p.name} ke ${nameOf(s, l.lender)} ditagih di grup chat RT (+denda ${CONFIG.loan.penaltyPct}%)!`, 'bad');
+  if (tasks.length || due.length) {
     startResolving(
       s,
-      due.map(
+      [...tasks, ...due.map(
         (l): PayTask => ({
           t: 'pay',
           from: p.id,
@@ -840,9 +897,76 @@ function advanceTurn(s: GameState) {
           reason: 'utang jatuh tempo',
           loanId: l.id,
         }),
-      ),
+      )],
       'preRoll',
     );
+  }
+}
+
+// ===================== Kabar Nusantara =====================
+
+function execRoundEvent(s: GameState) {
+  const d = (s.kabar ??= { draw: [], discard: [] });
+  if (d.draw.length === 0) {
+    d.draw = shuffle(s, d.discard.length ? d.discard : EVENTS.map((e) => e.id));
+    d.discard = [];
+  }
+  const id = d.draw.shift()!;
+  d.discard.push(id);
+  s.lastEvent = { eventId: id, seq: s.logSeq + 1 };
+  s.prompt = { type: 'event', eventId: id };
+  log(s, `📰 Kabar Nusantara putaran ${s.round}: "${EVENT_BY_ID[id].title}".`, 'card');
+}
+
+function buildingCounts(s: GameState, playerId: string) {
+  let homestay = 0;
+  let resort = 0;
+  for (const i of ownedTiles(s, playerId)) {
+    const lv = s.board[i].level;
+    if (lv === 5) resort += 1;
+    else homestay += lv;
+  }
+  return { homestay, resort };
+}
+
+function applyKabar(s: GameState, ev: KabarEvent): Task[] {
+  const e = ev.effect;
+  const order = orderFromCurrent(s);
+  const reason = ev.title;
+  const richest = () => order.reduce((m, p) => (p.cash > m.cash ? p : m), order[0]);
+  switch (e.type) {
+    case 'ALL_RECEIVE':
+      return order.map((p): Task => ({ t: 'receive', player: p.id, amount: e.amount, reason }));
+    case 'ALL_PAY':
+      return order.map((p): PayTask => ({ t: 'pay', from: p.id, to: e.to, amount: e.amount, reason }));
+    case 'POOREST_BONUS':
+      return [{ t: 'receive', player: poorest(order).id, amount: e.amount, reason }];
+    case 'RICHEST_PAY': {
+      const r = richest();
+      log(s, `Pemain dengan uang paling banyak: ${r.name}.`, 'info');
+      return [{ t: 'pay', from: r.id, to: e.to, amount: e.amount, reason }];
+    }
+    case 'ARISAN_BONUS':
+      transfer(s, 'bank', 'arisan', e.amount);
+      log(s, `Kas Arisan bertambah ${rp(e.amount)}.`, 'good');
+      return [];
+    case 'ALL_RECEIVE_PER_BUILDING':
+      return order.flatMap((p): Task[] => {
+        const { homestay, resort } = buildingCounts(s, p.id);
+        const amt = homestay * e.perHomestay + resort * e.perResort;
+        return amt > 0 ? [{ t: 'receive', player: p.id, amount: amt, reason }] : [];
+      });
+    case 'ALL_PAY_PER_BUILDING':
+      return order.flatMap((p): Task[] => {
+        const { homestay, resort } = buildingCounts(s, p.id);
+        const amt = homestay * e.perHomestay + resort * e.perResort;
+        return amt > 0 ? [{ t: 'pay', from: p.id, to: e.to, amount: amt, reason }] : [];
+      });
+    case 'EVERYONE_HELPS_POOREST': {
+      const poor = poorest(order);
+      log(s, `Pemain dengan uang paling sedikit: ${poor.name}.`, 'info');
+      return order.filter((q) => q.id !== poor.id).map((q): PayTask => ({ t: 'pay', from: q.id, to: { player: poor.id }, amount: e.amount, reason }));
+    }
   }
 }
 
@@ -913,7 +1037,8 @@ function handle(s: GameState, a: Action) {
         }
       }
       s.rolledDoubles = doubles;
-      return startResolving(s, [{ t: 'move', player: me.id, steps: total }]);
+      const bonus: Task[] = doubles && rulesOf(s).bonusCards ? [{ t: 'draw', player: me.id, deck: 'nasib', bonus: 'dobel' }] : [];
+      return startResolving(s, [{ t: 'move', player: me.id, steps: total }, ...bonus]);
     }
 
     case 'BUY': {
@@ -1192,6 +1317,23 @@ function handle(s: GameState, a: Action) {
       s.diceMode = a.mode;
       log(s, a.mode === 'digital' ? 'Dadu diganti ke acak otomatis.' : 'Dadu diganti ke dadu sungguhan di meja.', 'info');
       return;
+
+    case 'UPGRADE': {
+      const pr = requirePrompt(s, 'upgrade');
+      if (a.accept) {
+        if (!canVisitUpgrade(s, pr.player, pr.tile)) fail('Renovasi tidak bisa dilakukan (uang kurang atau batas tercapai).');
+        transfer(s, pr.player, 'bank', pr.cost);
+        s.board[pr.tile].level += 1;
+        const lv = s.board[pr.tile].level;
+        log(s, `🏗️ ${nameOf(s, pr.player)} merenovasi ${TILES[pr.tile].short}: kini ${lv === 5 ? 'Resort' : `${lv} Homestay`} (${rp(pr.cost)}).`, 'good');
+      } else log(s, `${nameOf(s, pr.player)} memilih belum merenovasi ${TILES[pr.tile].short}.`, 'info');
+      return resolvePromptAndRun(s);
+    }
+
+    case 'EVENT_OK': {
+      const pr = requirePrompt(s, 'event');
+      return resolvePromptAndRun(s, applyKabar(s, EVENT_BY_ID[pr.eventId]));
+    }
 
     case 'FINISH_GAME':
       finishGame(s, a.reason);

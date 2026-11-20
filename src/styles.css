@@ -2055,3 +2055,57 @@ h3 {
     opacity: 0;
   }
 }
+
+/* ===== Aturan Seru & Kabar Nusantara ===== */
+.rule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rule-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #fff;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+.rule-item input {
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  accent-color: var(--bata);
+  flex: 0 0 auto;
+}
+.rule-item span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rule-item small {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.deck-kabar .game-card-head {
+  background: repeating-linear-gradient(90deg, #3b2414 0 12px, #4a2c18 12px 24px);
+}
+.deck-kabar .game-card-body h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+}
+
+.player-name {
+  flex: 1;
+  min-width: 0;
+}
+.player-name strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.player-name small .turn-badge {
+  margin-left: 6px;
+  display: inline-block;
+}

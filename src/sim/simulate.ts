@@ -3,7 +3,7 @@
 
 import { botAction } from '../engine/bot.ts';
 import { createGame, moneyBalance, reduce } from '../engine/engine.ts';
-import type { GameMode, GameState } from '../engine/types.ts';
+import type { GameMode, GameRules, GameState } from '../engine/types.ts';
 
 export interface SimResult {
   seed: number;
@@ -19,12 +19,13 @@ export interface SimResult {
   error?: string;
 }
 
-export function simulate(seed: number, players: number, mode: GameMode, maxRounds: number | null, actionCap = 60_000): SimResult {
+export function simulate(seed: number, players: number, mode: GameMode, maxRounds: number | null, actionCap = 60_000, rules?: Partial<GameRules>): SimResult {
   let s: GameState = createGame({
     players: Array.from({ length: players }, (_, i) => ({ name: `Bot${i + 1}`, token: 'becak', color: '#000' })),
     mode,
     seed,
     kilatRounds: mode === 'kilat' ? maxRounds : null,
+    rules,
   });
   const res: SimResult = {
     seed,

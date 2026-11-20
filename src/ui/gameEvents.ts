@@ -34,6 +34,7 @@ export function diffEvents(prev: GameState, next: GameState): Draft[] {
     else if (b.level > a.level && a.owner === b.owner) out.push({ kind: 'build', player: b.owner, tile: t.index, level: b.level });
   }
   if (next.lastCard && next.lastCard.seq !== prev.lastCard?.seq) out.push({ kind: 'card', player: next.lastCard.player });
+  if (next.lastEvent && next.lastEvent.seq !== prev.lastEvent?.seq) out.push({ kind: 'card', player: next.players[next.current].id });
   if (next.phase === 'gameOver' && prev.phase !== 'gameOver' && next.winner) out.push({ kind: 'win', player: next.winner });
   else if (next.current !== prev.current && next.phase !== 'gameOver') out.push({ kind: 'turn', player: next.players[next.current].id });
   return out;
